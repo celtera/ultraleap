@@ -5,7 +5,9 @@ project(MyProcessor)
 include(dependencies.cmake)
 
 add_library(MyProcessor STATIC
-  src/Processor.cpp
+  src/Model.cpp
+  src/Model.hpp
+  src/UI.hpp
   src/Processor.hpp
 )
 
