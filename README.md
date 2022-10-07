@@ -14,6 +14,9 @@ $ sudo pacman -S vst3sdk pd pybind11
 
 will install things.
 
+To see a complete build procedure, one can refer to the [Github actions workflows](.github/workflows/), which compile 
+the project on clean virtual machines.
+
 ## Python
  
 [Get it there](https://github.com/pybind/pybind11) and pass to cmake:
