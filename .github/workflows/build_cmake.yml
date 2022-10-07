@@ -50,8 +50,8 @@ jobs:
           - {
               name: "Ubuntu (GCC)",
               os: ubuntu-latest,
-              common_flags: "-DCMAKE_C_COMPILER=/usr/bin/gcc-12 \
-                             -DCMAKE_CXX_COMPILER=/usr/bin/g++-12",
+              common_flags: "-DCMAKE_C_COMPILER=/usr/bin/gcc-11 \
+                             -DCMAKE_CXX_COMPILER=/usr/bin/g++-11",
               debug_flags: "-DCMAKE_BUILD_TYPE=Debug",
               release_flags: "-DCMAKE_BUILD_TYPE=Release",
               build_flags: "",
@@ -110,9 +110,9 @@ jobs:
 
           cmake .. \
             -DBOOST_ROOT=${{ matrix.config.sdk }}/boost \
-            -Dpybind11_DIR=$SDK_3RDPARTY/libossia/3rdparty/pybind11 \
-            -DAVND_MAXSDK_PATH=$SDK_3RDPARTY/libossia/3rdparty/max-sdk \
-            -DVST3_SDK_ROOT=$SDK_3RDPARTY/vst3 \
+            -Dpybind11_DIR="$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
+            -DAVND_MAXSDK_PATH="$SDK_3RDPARTY/libossia/3rdparty/max-sdk" \
+            -DVST3_SDK_ROOT="$SDK_3RDPARTY/vst3" \
             -DCMAKE_PREFIX_PATH="$SDK_3RDPARTY/libpd/pure-data/src" \
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.debug_flags }}
@@ -133,10 +133,10 @@ jobs:
           export VERBOSE=1
 
           cmake .. \
-            -DBOOST_ROOT=${{ matrix.config.sdk }}/boost \
-            -Dpybind11_DIR=$SDK_3RDPARTY/libossia/3rdparty/pybind11 \
-            -DAVND_MAXSDK_PATH=$SDK_3RDPARTY/libossia/3rdparty/max-sdk \
-            -DVST3_SDK_ROOT=$SDK_3RDPARTY/vst3 \
+            -DBOOST_ROOT="${{ matrix.config.sdk }}/boost" \
+            -Dpybind11_DIR="$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
+            -DAVND_MAXSDK_PATH="$SDK_3RDPARTY/libossia/3rdparty/max-sdk" \
+            -DVST3_SDK_ROOT="$SDK_3RDPARTY/vst3" \
             -DCMAKE_PREFIX_PATH="$SDK_3RDPARTY/libpd/pure-data/src;$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.release_flags }}
