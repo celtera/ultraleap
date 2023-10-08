@@ -109,20 +109,18 @@ jobs:
       - name: Build debug
         shell: bash
         run: |
-          mkdir build-debug
-          cd build-debug
-
+          export BUILD_DIR=build-debug
           if [[ "${{ matrix.config.path }}" != "" ]]; then
             export PATH=${{ matrix.config.path }}:$PATH
           fi
 
-          export MAX_SDK=$PWD/../max-sdk-base
-          export SDK_3RDPARTY=$PWD/../score/3rdparty
+          export MAX_SDK=$PWD/max-sdk-base
+          export SDK_3RDPARTY=$PWD/score/3rdparty
           export VERBOSE=1
 
           ${{ matrix.config.pre_build }}
 
-          cmake .. \
+          cmake -S $PWD -B $BUILD_DIR \
             -DBOOST_ROOT=${{ matrix.config.sdk }}/boost \
             -Dpybind11_DIR="$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
             -DAVND_MAXSDK_PATH=$MAX_SDK \
@@ -131,31 +129,69 @@ jobs:
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.debug_flags }}
 
-          cmake --build . -- ${{ matrix.config.build_flags }}
+          cmake --build $BUILD_DIR -- ${{ matrix.config.build_flags }}
 
       - name: Build release
         shell: bash
         run: |
-          mkdir build-release
-          cd build-release
+          export BUILD_DIR=build-release
 
           if [[ "${{ matrix.config.path }}" != "" ]]; then
             export PATH=${{ matrix.config.path }}:$PATH
           fi
 
-          export MAX_SDK=$PWD/../max-sdk-base
-          export SDK_3RDPARTY=$PWD/../score/3rdparty
+          export MAX_SDK=$PWD/max-sdk-base
+          export SDK_3RDPARTY=$PWD/score/3rdparty
           export VERBOSE=1
 
           ${{ matrix.config.pre_build }}
 
-          cmake .. \
+          cmake -S $PWD -B $BUILD_DIR \
             -DBOOST_ROOT="${{ matrix.config.sdk }}/boost" \
             -Dpybind11_DIR="$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
             -DAVND_MAXSDK_PATH=$MAX_SDK \
             -DVST3_SDK_ROOT="$SDK_3RDPARTY/vst3" \
             -DCMAKE_PREFIX_PATH="$SDK_3RDPARTY/libpd/pure-data/src;$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=1 \
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.release_flags }}
 
-          cmake --build . -- ${{ matrix.config.build_flags }}
+          cmake --build $BUILD_DIR -- ${{ matrix.config.build_flags }}
+
+          pwd
+          
+          ls $BUILD_DIR
+
+          mkdir $BUILD_DIR/clap
+          mkdir $BUILD_DIR/python
+          mkdir $BUILD_DIR/max
+
+          echo " === pd === "
+          ls $BUILD_DIR/pd
+          echo " === max === "
+          ls $BUILD_DIR/max
+          echo " === python === "
+          ls $BUILD_DIR/python
+          echo " === vst2 === "
+          ls $BUILD_DIR/vintage
+          echo " === vst3 === "
+          ls $BUILD_DIR/vst3
+          echo " === standalone === "
+          ls $BUILD_DIR/standalone
+          echo " === example === "
+          ls $BUILD_DIR/example
+          echo " === clap === "
+          ls $BUILD_DIR/clap
+
+    - name: Upload 
+      uses: xresloader/upload-to-github-release@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "build-release/pd/*;build-release/vintage/*;build-release/python/*;build-release/vst3/*;build-release/clap/*;build-release/max/*"
+        delete_file: "*"
+        branches: "main"
+        verbose: true
+        prerelease: true
+        tag_name: "continuous"
+        default_release_name: "Continuous build"
