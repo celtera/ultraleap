@@ -174,7 +174,7 @@ jobs:
               echo " === $binding === "
               ls $BUILD_DIR/$binding
               cd $BUILD_DIR/$binding
-              for file in ./*; do
+              for file in *; do
                 # Zip stuff 
                 cmake -E tar cf "$INSTALL_DIR/$binding-${{ matrix.config.triple }}-$file.zip" --format=zip -- "$file"
                 rm -rf "$file"
