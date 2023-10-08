@@ -162,27 +162,20 @@ jobs:
           
           ls $BUILD_DIR
 
-          mkdir $BUILD_DIR/clap
-          mkdir $BUILD_DIR/python
-          mkdir $BUILD_DIR/max
-
-          echo " === pd === "
-          ls $BUILD_DIR/pd
-          echo " === max === "
-          ls $BUILD_DIR/max
-          echo " === python === "
-          ls $BUILD_DIR/python
-          echo " === vst2 === "
-          ls $BUILD_DIR/vintage
-          echo " === vst3 === "
-          ls $BUILD_DIR/vst3
-          echo " === standalone === "
-          ls $BUILD_DIR/standalone
-          echo " === example === "
-          ls $BUILD_DIR/example
-          echo " === clap === "
-          ls $BUILD_DIR/clap
-
+          for binding in pd max clap python standalone example vintage vst3; do
+          mkdir -p $BUILD_DIR/$binding
+            (
+              echo " === $binding === "
+              ls $BUILD_DIR/$binding
+              cd $BUILD_DIR/$binding
+              for file in ./*; do
+                if [[ -d "$file" ]]; then
+                  zip -r "$file.zip" "$file"
+                  rm -rf "$file"
+                fi
+              done
+            )
+          done
       - name: Upload 
         uses: xresloader/upload-to-github-release@main
         env:
