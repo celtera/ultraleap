@@ -139,7 +139,8 @@ jobs:
         shell: bash
         run: |
           export BUILD_DIR=build-release
-          export INSTALL_DIR=$PWD/install
+          export INSTALL_DIR="$PWD/install"
+          mkdir -p "$INSTALL_DIR"
 
           if [[ "${{ matrix.config.path }}" != "" ]]; then
             export PATH=${{ matrix.config.path }}:$PATH
@@ -181,12 +182,33 @@ jobs:
             )
           done
 
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.config.triple }}
+          path: |
+            $INSTALL_DIR/*
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Combine
+        shell: bash
+        run: |
+          find . -name '*.zip' 
+          mkdir -p output
+          find . -name '*.zip' -exec mv {} output/ \;
+
       - name: Upload 
         uses: xresloader/upload-to-github-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: "build-release/pd/*;build-release/vintage/*;build-release/python/*;build-release/vst3/*;build-release/clap/*;build-release/max/*"
+          file: "output/*"
           delete_file: "*"
           branches: "main"
           verbose: true
