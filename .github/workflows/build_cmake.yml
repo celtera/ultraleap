@@ -167,7 +167,7 @@ jobs:
           pwd
           
           ls $BUILD_DIR
-
+          shopt -s nullglob
           for binding in pd max clap python standalone example vintage vst3; do
             (
               mkdir -p $BUILD_DIR/$binding
