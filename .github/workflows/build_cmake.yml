@@ -183,15 +183,15 @@ jobs:
           echo " === clap === "
           ls $BUILD_DIR/clap
 
-    - name: Upload 
-      uses: xresloader/upload-to-github-release@main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "build-release/pd/*;build-release/vintage/*;build-release/python/*;build-release/vst3/*;build-release/clap/*;build-release/max/*"
-        delete_file: "*"
-        branches: "main"
-        verbose: true
-        prerelease: true
-        tag_name: "continuous"
-        default_release_name: "Continuous build"
+      - name: Upload 
+        uses: xresloader/upload-to-github-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: "build-release/pd/*;build-release/vintage/*;build-release/python/*;build-release/vst3/*;build-release/clap/*;build-release/max/*"
+          delete_file: "*"
+          branches: "main"
+          verbose: true
+          prerelease: true
+          tag_name: "continuous"
+          default_release_name: "Continuous build"
