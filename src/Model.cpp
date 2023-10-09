@@ -1,14 +1,141 @@
 #include "Model.hpp"
 
-void MyProcessor::operator()(int N)
+namespace ul
 {
-  for(int i = 0; i < this->inputs.audio.channels(); i++)
+UltraLeap::UltraLeap()
+    : m_instance{ul::instance<ul::leap_manager>()}
+{
+}
+
+UltraLeap::~UltraLeap()
+{
+  m_instance->unsubscribe(m_handle);
+}
+
+void UltraLeap::initialize() noexcept
+{
+  m_handle = m_instance->subscribe({
+      .on_tracking_event = [this] (message m) {
+        this->msg.enqueue(std::move(m));
+        this->schedule.schedule_at(0, +[] (UltraLeap& self){
+              self();
+            });
+      }
+  });
+}
+
+
+void UltraLeap::operator()() noexcept
+{
+  int count = 0;
+  message m;
+  for(int i = 0; i < 3; i++)
   {
-    auto* in = this->inputs.audio[i];
-    auto* out = this->outputs.audio[i];
-    for (int j = 0; j < N; j++)
+    if(msg.try_dequeue(m))
+      count++;
+    else
+      break;
+  }
+
+  if(count > 0) {
+    boost::variant2::visit([this] (const auto& msg) {
+      this->on_message(msg);
+    }, m);
+  }
+}
+
+void UltraLeap::on_message(const head_message& msg) noexcept
+{
+  // TODO
+}
+
+void UltraLeap::on_message(const eye_message& msg) noexcept
+{
+  // TODO
+}
+
+void UltraLeap::on_message(const tracking_message& msg) noexcept
+{
+  outputs.start_frame();
+
+  const auto Nhand = msg.hands.size();
+  outputs.frame(
+      FrameInfo{ .frame = msg.frame_id
+          , .time = 0
+          , .hands = int(Nhand)
+      });
+
+  for(int i = 0; i < Nhand; i++)
+  {
+    const auto& ih = msg.hands[i];
+    HandInfo oh;
+    oh.id = ih.id;
+
+    oh.px = ih.palm.position.x;
+    oh.py = ih.palm.position.y;
+    oh.pz = ih.palm.position.z;
+
+    oh.vx = ih.palm.velocity.x;
+    oh.vy = ih.palm.velocity.y;
+    oh.vz = ih.palm.velocity.z;
+
+    oh.o1 = ih.palm.orientation.x;
+    oh.o2 = ih.palm.orientation.y;
+    oh.o3 = ih.palm.orientation.z;
+    oh.o4 = ih.palm.orientation.w;
+
+    oh.radius = ih.palm.width;
+    oh.pinch = ih.pinch_strength;
+    oh.grab = ih.grab_strength;
+
+    if(ih.type == eLeapHandType::eLeapHandType_Left)
     {
-      out[j] = in[j] * inputs.gain;
+      outputs.hand_l(oh);
+    }
+    else
+    {
+      outputs.hand_r(oh);
+    }
+
+    int k = 0;
+    for(const auto& finger : ih.digits) {
+      FingerInfo of;
+
+      of.hand_id = ih.id;
+      of.id = 10 * of.hand_id + finger.finger_id;
+
+      of.px = finger.distal.next_joint.x;
+      of.py = finger.distal.next_joint.y;
+      of.pz = finger.distal.next_joint.z;
+
+      of.dx = finger.distal.next_joint.x - finger.distal.prev_joint.x;
+      of.dy = finger.distal.next_joint.y - finger.distal.prev_joint.y;
+      of.dz = finger.distal.next_joint.z - finger.distal.prev_joint.z;
+
+      // of.vx = ih.palm.velocity.x;
+      // of.vy = ih.palm.velocity.y;
+      // of.vz = ih.palm.velocity.z;
+
+      of.width =  0.;
+      of.length = 0.;
+      for(auto& bone : finger.bones) {
+        auto len = std::hypot(bone.next_joint.x - bone.prev_joint.x, bone.next_joint.y - bone.prev_joint.y, bone.next_joint.z - bone.prev_joint.z);
+        of.length += len;
+      }
+      of.extended = finger.is_extended;
+      of.type = k++;
+
+      if(ih.type == eLeapHandType::eLeapHandType_Left)
+      {
+        outputs.finger_l(of);
+      }
+      else
+      {
+        outputs.finger_r(of);
+      }
     }
   }
+
+  outputs.end_frame();
+}
 }
