@@ -115,15 +115,23 @@ jobs:
         shell: bash
         if: runner.os == 'macOS'
         run: |
+          echo A
           set +x
+          echo B
           security create-keychain -p "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN"
+          echo C
           security default-keychain -s "$MAC_CODESIGN_KEYCHAIN"
+          echo D
           security unlock-keychain -p "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN"
+          echo E
       
           security import "$HOME/cert.p12" -k "$MAC_CODESIGN_KEYCHAIN" -P "$MAC_CODESIGN_PASSWORD" -T /usr/bin/codesign > /dev/null 2>&1
+          echo F
           security set-key-partition-list -S apple-tool:,apple: -s -k "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN" > /dev/null 2>&1
+          echo G
       
           rm -rf "$HOME/cert.p12"
+          echo H
 
       - name: Build debug
         shell: bash
