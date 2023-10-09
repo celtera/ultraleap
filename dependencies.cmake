@@ -17,7 +17,7 @@ FetchContent_Declare(
 )
 FetchContent_Populate(max_sdk)
 
-set(AVND_MAXSDK_PATH "${max_sdk_SOURCE_DIR}")
+set(AVND_MAXSDK_PATH "${max_sdk_SOURCE_DIR}" CACHE INTERNAL "")
 
 # PureData
 if(WIN32)
