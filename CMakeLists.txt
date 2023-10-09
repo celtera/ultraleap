@@ -34,7 +34,7 @@ if(MAX_PACKAGE_FOLDER)
         CODESIGN
         NOTARIZE
 
-        NAME Leap2
+        NAME UltraLeap
         SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/max/package"
         PACKAGE_ROOT "${MAX_PACKAGE_FOLDER}"
 

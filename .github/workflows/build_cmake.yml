@@ -148,6 +148,9 @@ jobs:
 
           cmake -S $PWD -B $BUILD_DIR \
             -DLEAPSDK_PATH="$PWD/LeapSDK" \
+            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
+            -DCMAKE_CXX_STANDARD=20 \
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.debug_flags }}
 
@@ -169,31 +172,22 @@ jobs:
           cmake -S $PWD -B $BUILD_DIR \
             -DCMAKE_BUILD_WITH_INSTALL_RPATH=1 \
             -DLEAPSDK_PATH="$PWD/LeapSDK" \
+            -DMAX_PACKAGE_FOLDER="$PWD/UltraLeap" \
+            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0" \
+            -DCMAKE_CXX_STANDARD=20 \
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.release_flags }}
 
           cmake --build $BUILD_DIR -- ${{ matrix.config.build_flags }}
 
-          shopt -s nullglob
-          for binding in pd max clap python standalone example vintage vst3; do
-            (
-              mkdir -p $BUILD_DIR/$binding
-              echo " === $binding === "
-              cd $BUILD_DIR/$binding
-              for file in *; do
-                # Zip stuff 
-                cmake -E tar cf "$INSTALL_DIR/$binding-${{ matrix.config.triple }}-$file.zip" --format=zip -- "$file"
-                rm -rf "$file"
-              done
-            )
-          done
+          cmake -E tar cf "$PWD/UltraLeap.zip" --format=zip -- "$PWD/UltraLeap"
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.config.triple }}
-          path: |
-            install/*
+          path: UltraLeap-${{ matrix.config.triple }}.zip
 
   release:
     name: Release
@@ -206,9 +200,18 @@ jobs:
       - name: Combine
         shell: bash
         run: |
-          find . -name '*.zip' 
+        
           mkdir -p output
           find . -name '*.zip' -exec mv {} output/ \;
+          cd output
+          for file in *.zip; do
+            unzip -o $file
+          done
+          ls
+          rm *.zip
+
+          zip -r UltraLeap-max.zip UltraLeap
+          rm -rf UltraLeap
 
       - name: Upload 
         uses: xresloader/upload-to-github-release@main
