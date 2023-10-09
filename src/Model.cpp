@@ -14,7 +14,11 @@ UltraLeap::~UltraLeap()
 
 void UltraLeap::initialize() noexcept
 {
+  m_active = this->inputs.active;
   m_handle = m_instance->subscribe({.on_tracking_event = [this](message m) {
+    if(!this->m_active.load(std::memory_order_acquire))
+      return;
+
     this->msg.enqueue(std::move(m));
     this->schedule.schedule_at(
         0, +[](UltraLeap& self) { self(); });
@@ -49,17 +53,31 @@ void UltraLeap::on_message(const eye_message& msg) noexcept
   // TODO
 }
 
+void UltraLeap::update_active()
+{
+  m_active = this->inputs.active;
+}
+
 void UltraLeap::on_message(const tracking_message& msg) noexcept
 {
   outputs.start_frame();
 
-  const auto Nhand = msg.hands.size();
-  outputs.frame(FrameInfo{
-      .frame = msg.frame_id
-      //, .time = 0
-      ,
-      .hands = int(Nhand),
-      .framerate = msg.framerate});
+  const int Nhand = msg.hands.size();
+  FrameInfo frameInfo{
+            .frame = msg.frame_id
+            //, .time = 0
+            , .framerate = msg.framerate};
+
+  for(int i = 0; i < Nhand; i++)
+  {
+    const auto& ih = msg.hands[i];
+    if(ih.type == eLeapHandType_Left)
+      frameInfo.leftHandTracked = true;
+    else
+      frameInfo.rightHandTracked = true;
+  }
+
+  outputs.frame(frameInfo);
 
   for(int i = 0; i < Nhand; i++)
   {

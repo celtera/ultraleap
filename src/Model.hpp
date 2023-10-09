@@ -53,7 +53,8 @@ struct FrameInfo
 {
   int64_t frame{};
   //int64_t time{};
-  int hands{};
+  bool leftHandTracked{};
+  bool rightHandTracked{};
   float framerate{};
 };
 
@@ -61,8 +62,8 @@ struct UltraLeap
 {
 public:
   halp_meta(name, "UltraLeap")
-  halp_meta(c_name, "avnd_ultraleap")
-  halp_meta(author, "Jean-Michaël Celerier")
+  halp_meta(c_name, "ultraleap")
+  halp_meta(author, "Jean-Michaël Celerier & Mathieu Chamagne")
   halp_meta(category, "Devices")
   halp_meta(description, "Process UltraLeap input")
   halp_meta(uuid, "52cf0135-9104-4c0b-85dc-1a95b54eda4b")
@@ -72,6 +73,9 @@ public:
     struct : halp::val_port<"active", bool>
     {
       halp_flag(class_attribute);
+      void update(UltraLeap& obj) {
+        obj.update_active();
+      }
     } active;
 
     struct : halp::val_port<"Device Index", int>
@@ -120,10 +124,14 @@ public:
   void on_message(const head_message& msg) noexcept;
   void on_message(const eye_message& msg) noexcept;
 
+  void update_active();
+
   std::shared_ptr<ul::leap_manager> m_instance;
   ul::subscriber_handle m_handle;
 
   moodycamel::ConcurrentQueue<message> msg;
+
+  std::atomic_bool m_active{true};
 };
 
 }

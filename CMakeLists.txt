@@ -25,7 +25,7 @@ avnd_make(
   TARGET UltraLeap
   MAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/Model.hpp"
   MAIN_CLASS ul::UltraLeap
-  C_NAME avnd_ultraleap
+  C_NAME ultraleap
   BACKENDS max
 )
 
