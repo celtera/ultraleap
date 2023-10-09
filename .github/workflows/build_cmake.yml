@@ -187,7 +187,7 @@ jobs:
         with:
           name: ${{ matrix.config.triple }}
           path: |
-            $INSTALL_DIR/*
+            install/*
 
   release:
     name: Release
