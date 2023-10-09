@@ -215,7 +215,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           file: "output/*"
-          delete_file: "*"
           branches: "main"
           verbose: true
           prerelease: true
