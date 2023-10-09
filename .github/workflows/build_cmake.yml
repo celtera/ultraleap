@@ -108,6 +108,7 @@ jobs:
           token: ${{ secrets.GIT_CLONE_TOKEN }}
 
       - name: Retrieve the secret and decode it to a file
+        if: runner.os == 'macOS'
         run: |
           echo $MAC_CODESIGN_FILE_B64 | base64 --decode > "$HOME/cert.p12"
 
@@ -115,17 +116,13 @@ jobs:
         shell: bash
         if: runner.os == 'macOS'
         run: |
-          echo A
           set +x
-          echo B
-          security create-keychain -p "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN"
-          echo C
+          security create-keychain -p "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN"          
           security default-keychain -s "$MAC_CODESIGN_KEYCHAIN"
-          echo D
           security unlock-keychain -p "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN"
-          echo E
       
-          security import "$HOME/cert.p12" -k "$MAC_CODESIGN_KEYCHAIN" -P "$MAC_CODESIGN_PASSWORD" -T /usr/bin/codesign > /dev/null 2>&1
+          ls "$HOME/cert.p12"
+          security import "$HOME/cert.p12" -k "$MAC_CODESIGN_KEYCHAIN" -P "$MAC_CODESIGN_PASSWORD" -T /usr/bin/codesign
           echo F
           security set-key-partition-list -S apple-tool:,apple: -s -k "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN" > /dev/null 2>&1
           echo G
