@@ -2,6 +2,16 @@ name: CMake build
 
 on: push
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MAC_CODESIGN_EMAIL: ${{ secrets.MAC_CODESIGN_EMAIL }}
+  MAC_CODESIGN_IDENTITY: ${{ secrets.MAC_CODESIGN_IDENTITY }}
+  MAC_CODESIGN_KEYCHAIN: "/Users/jcelerier/Documents/travis.keychain"
+  MAC_CODESIGN_KEYCHAIN_PASSWORD: "travis"
+  MAC_CODESIGN_PASSWORD: ${{ secrets.MAC_CODESIGN_PASSWORD }}
+  MAC_CODESIGN_TEAM: ${{ secrets.MAC_CODESIGN_TEAM }}
+  MAC_CODESIGN_FILE_B64: ${{ secrets.MAC_CODESIGN_FILE_B64 }}
+
 jobs:
   build:
     name: ${{ matrix.config.name }}
@@ -84,31 +94,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Checkout dependencies
-        uses: actions/checkout@v4
-        with:
-          repository: ossia/score
-          submodules: "recursive"
-          path: score
-
       - name: Install dependencies
         shell: bash
         run: |
           ${{ matrix.config.dependencies }}
 
-      - name: Download SDK
-        shell: bash
-        run: |
-          curl -L https://raw.githubusercontent.com/ossia/score/master/tools/fetch-sdk.sh > fetch-sdk.sh
-          chmod +x ./fetch-sdk.sh
-          ./fetch-sdk.sh
-
-      - name: Checkout Max SDK
+      - name: Checkout Leap SDK
         uses: actions/checkout@v4
         with:
-          repository: jcelerier/max-sdk-base
+          repository: celtera/LeapSDK
           submodules: "recursive"
-          path: max-sdk-base
+          path: LeapSDK
+
+      - name: Retrieve the secret and decode it to a file
+        run: |
+          echo $CERTIFICATE_BASE64 | base64 --decode > $HOME/cert.p12
+
+      - name: Setup Codesigning
+        shell: bash
+        if: runner.os == 'macOS'
+        run: |
+          (
+          set +x
+          security create-keychain -p $MAC_CODESIGN_KEYCHAIN_PASSWORD $MAC_CODESIGN_KEYCHAIN
+          security default-keychain -s $MAC_CODESIGN_KEYCHAIN
+          security unlock-keychain -p $MAC_CODESIGN_KEYCHAIN_PASSWORD $MAC_CODESIGN_KEYCHAIN
+      
+          security import $HOME/cert.p12 -k $MAC_CODESIGN_KEYCHAIN -P $MAC_CODESIGN_PASSWORD -T /usr/bin/codesign > /dev/null 2>&1
+          security set-key-partition-list -S apple-tool:,apple: -s -k $MAC_CODESIGN_KEYCHAIN_PASSWORD $MAC_CODESIGN_KEYCHAIN > /dev/null 2>&1
+      
+          rm -rf $HOME/cert.p12
+          )
 
       - name: Build debug
         shell: bash
@@ -118,18 +134,10 @@ jobs:
             export PATH=${{ matrix.config.path }}:$PATH
           fi
 
-          export MAX_SDK=$PWD/max-sdk-base
-          export SDK_3RDPARTY=$PWD/score/3rdparty
-          export VERBOSE=1
-
           ${{ matrix.config.pre_build }}
 
-          cmake -S $PWD -B $BUILD_DIR \
-            -DBOOST_ROOT=${{ matrix.config.sdk }}/boost \
-            -Dpybind11_DIR="$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
-            -DAVND_MAXSDK_PATH=$MAX_SDK \
-            -DVST3_SDK_ROOT="$SDK_3RDPARTY/vst3" \
-            -DCMAKE_PREFIX_PATH="$SDK_3RDPARTY/libpd/pure-data/src;$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
+          cmake -GNinja -S $PWD -B $BUILD_DIR \
+            -DLEAPSDK_PATH="$PWD/LeapSDK" \
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.debug_flags }}
 
@@ -146,33 +154,21 @@ jobs:
             export PATH=${{ matrix.config.path }}:$PATH
           fi
 
-          export MAX_SDK=$PWD/max-sdk-base
-          export SDK_3RDPARTY=$PWD/score/3rdparty
-          export VERBOSE=1
-
           ${{ matrix.config.pre_build }}
 
-          cmake -S $PWD -B $BUILD_DIR \
-            -DBOOST_ROOT="${{ matrix.config.sdk }}/boost" \
-            -Dpybind11_DIR="$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
-            -DAVND_MAXSDK_PATH=$MAX_SDK \
-            -DVST3_SDK_ROOT="$SDK_3RDPARTY/vst3" \
-            -DCMAKE_PREFIX_PATH="$SDK_3RDPARTY/libpd/pure-data/src;$SDK_3RDPARTY/libossia/3rdparty/pybind11" \
+          cmake -GNinja -S $PWD -B $BUILD_DIR \
             -DCMAKE_BUILD_WITH_INSTALL_RPATH=1 \
+            -DLEAPSDK_PATH="$PWD/LeapSDK" \
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.release_flags }}
 
           cmake --build $BUILD_DIR -- ${{ matrix.config.build_flags }}
 
-          pwd
-          
-          ls $BUILD_DIR
           shopt -s nullglob
           for binding in pd max clap python standalone example vintage vst3; do
             (
               mkdir -p $BUILD_DIR/$binding
               echo " === $binding === "
-              ls $BUILD_DIR/$binding
               cd $BUILD_DIR/$binding
               for file in *; do
                 # Zip stuff 
