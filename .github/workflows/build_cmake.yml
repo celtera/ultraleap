@@ -6,7 +6,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MAC_CODESIGN_EMAIL: ${{ secrets.MAC_CODESIGN_EMAIL }}
   MAC_CODESIGN_IDENTITY: ${{ secrets.MAC_CODESIGN_IDENTITY }}
-  MAC_CODESIGN_KEYCHAIN: "/Users/jcelerier/Documents/travis.keychain"
+  MAC_CODESIGN_KEYCHAIN: "$HOME/travis.keychain"
   MAC_CODESIGN_KEYCHAIN_PASSWORD: "travis"
   MAC_CODESIGN_PASSWORD: ${{ secrets.MAC_CODESIGN_PASSWORD }}
   MAC_CODESIGN_TEAM: ${{ secrets.MAC_CODESIGN_TEAM }}
@@ -109,23 +109,21 @@ jobs:
 
       - name: Retrieve the secret and decode it to a file
         run: |
-          echo $CERTIFICATE_BASE64 | base64 --decode > $HOME/cert.p12
+          echo $MAC_CODESIGN_FILE_B64 | base64 --decode > "$HOME/cert.p12"
 
       - name: Setup Codesigning
         shell: bash
         if: runner.os == 'macOS'
         run: |
-          (
           set +x
-          security create-keychain -p $MAC_CODESIGN_KEYCHAIN_PASSWORD $MAC_CODESIGN_KEYCHAIN
-          security default-keychain -s $MAC_CODESIGN_KEYCHAIN
-          security unlock-keychain -p $MAC_CODESIGN_KEYCHAIN_PASSWORD $MAC_CODESIGN_KEYCHAIN
+          security create-keychain -p "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN"
+          security default-keychain -s "$MAC_CODESIGN_KEYCHAIN"
+          security unlock-keychain -p "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN"
       
-          security import $HOME/cert.p12 -k $MAC_CODESIGN_KEYCHAIN -P $MAC_CODESIGN_PASSWORD -T /usr/bin/codesign > /dev/null 2>&1
-          security set-key-partition-list -S apple-tool:,apple: -s -k $MAC_CODESIGN_KEYCHAIN_PASSWORD $MAC_CODESIGN_KEYCHAIN > /dev/null 2>&1
+          security import "$HOME/cert.p12" -k "$MAC_CODESIGN_KEYCHAIN" -P "$MAC_CODESIGN_PASSWORD" -T /usr/bin/codesign > /dev/null 2>&1
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN" > /dev/null 2>&1
       
-          rm -rf $HOME/cert.p12
-          )
+          rm -rf "$HOME/cert.p12"
 
       - name: Build debug
         shell: bash
