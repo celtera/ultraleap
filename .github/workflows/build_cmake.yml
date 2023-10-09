@@ -146,7 +146,7 @@ jobs:
 
           ${{ matrix.config.pre_build }}
 
-          cmake -GNinja -S $PWD -B $BUILD_DIR \
+          cmake -S $PWD -B $BUILD_DIR \
             -DLEAPSDK_PATH="$PWD/LeapSDK" \
             ${{ matrix.config.common_flags }} \
             ${{ matrix.config.debug_flags }}
@@ -166,7 +166,7 @@ jobs:
 
           ${{ matrix.config.pre_build }}
 
-          cmake -GNinja -S $PWD -B $BUILD_DIR \
+          cmake -S $PWD -B $BUILD_DIR \
             -DCMAKE_BUILD_WITH_INSTALL_RPATH=1 \
             -DLEAPSDK_PATH="$PWD/LeapSDK" \
             ${{ matrix.config.common_flags }} \
