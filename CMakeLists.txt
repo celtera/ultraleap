@@ -16,6 +16,7 @@ add_library(UltraLeap STATIC
 )
 
 target_link_libraries(UltraLeap PUBLIC
+    Avendish::Avendish
     Boost::boost
     LeapC::Leap
 )
