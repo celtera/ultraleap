@@ -6,7 +6,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MAC_CODESIGN_EMAIL: ${{ secrets.MAC_CODESIGN_EMAIL }}
   MAC_CODESIGN_IDENTITY: ${{ secrets.MAC_CODESIGN_IDENTITY }}
-  MAC_CODESIGN_KEYCHAIN: "$HOME/travis.keychain"
+  MAC_CODESIGN_KEYCHAIN: "/Users/runner/travis.keychain"
   MAC_CODESIGN_KEYCHAIN_PASSWORD: "travis"
   MAC_CODESIGN_PASSWORD: ${{ secrets.MAC_CODESIGN_PASSWORD }}
   MAC_CODESIGN_TEAM: ${{ secrets.MAC_CODESIGN_TEAM }}
@@ -127,14 +127,10 @@ jobs:
           security unlock-keychain -p "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN"
       
           echo $MAC_CODESIGN_FILE_B64 | base64 --decode > "$HOME/cert.p12"
-          ls "$HOME/cert.p12"
-          security import "$HOME/cert.p12" -k "$MAC_CODESIGN_KEYCHAIN" -P "$MAC_CODESIGN_PASSWORD" -T /usr/bin/codesign
-          echo F
+          security import "$HOME/cert.p12" -k "$MAC_CODESIGN_KEYCHAIN" -P "$MAC_CODESIGN_PASSWORD" -T /usr/bin/codesign  > /dev/null 2>&1
           security set-key-partition-list -S apple-tool:,apple: -s -k "$MAC_CODESIGN_KEYCHAIN_PASSWORD" "$MAC_CODESIGN_KEYCHAIN" > /dev/null 2>&1
-          echo G
       
           rm -rf "$HOME/cert.p12"
-          echo H
 
       - name: Build debug
         shell: bash
@@ -181,7 +177,7 @@ jobs:
 
           cmake --build $BUILD_DIR -- ${{ matrix.config.build_flags }}
 
-          cmake -E tar cf "$PWD/UltraLeap.zip" --format=zip -- "$PWD/UltraLeap"
+          cmake -E tar cf "$PWD/UltraLeap-${{ matrix.config.triple }}.zip" --format=zip -- "$PWD/UltraLeap"
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
