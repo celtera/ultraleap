@@ -61,8 +61,9 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
   const auto Nhand = msg.hands.size();
   outputs.frame(
       FrameInfo{ .frame = msg.frame_id
-          , .time = 0
+          //, .time = 0
           , .hands = int(Nhand)
+          , .framerate = msg.framerate
       });
 
   for(int i = 0; i < Nhand; i++)
@@ -84,9 +85,11 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
     oh.o3 = ih.palm.orientation.z;
     oh.o4 = ih.palm.orientation.w;
 
-    oh.radius = ih.palm.width;
+    //oh.radius = ih.palm.width;
     oh.pinch = ih.pinch_strength;
     oh.grab = ih.grab_strength;
+    
+    oh.time = ih.visible_time * 0.000001;
 
     if(ih.type == eLeapHandType::eLeapHandType_Left)
     {
@@ -100,13 +103,20 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
     int k = 0;
     for(const auto& finger : ih.digits) {
       FingerInfo of;
-
-      of.hand_id = ih.id;
-      of.id = 10 * of.hand_id + finger.finger_id;
-
+        
+      of.id = finger.finger_id;
+      //of.hand_id = ih.id;
+      //of.id = 10 * of.hand_id + finger.finger_id;
+      
       of.px = finger.distal.next_joint.x;
       of.py = finger.distal.next_joint.y;
       of.pz = finger.distal.next_joint.z;
+        
+        //no quat for fingers ?
+        //of.o1 = finger.distal.orientation.x;
+        //of.o2 = finger.distal.orientation.y;
+        //of.o3 = finger.distal.orientation.z;
+        //of.o4 = finger.distal.orientation.w;
 
       of.dx = finger.distal.next_joint.x - finger.distal.prev_joint.x;
       of.dy = finger.distal.next_joint.y - finger.distal.prev_joint.y;

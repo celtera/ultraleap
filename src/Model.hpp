@@ -16,10 +16,16 @@ namespace ul
 {
 struct FingerInfo
 {
+    
   int id{};
-  int hand_id{};
-  float px{}, py{}, pz{};
-  float dx{}, dy{}, dz{};
+  //int hand_id{};
+  float px{}, py{}, pz{}; //finger distal next_joint position
+  
+//quat
+ //   float o1{}, o2{}, o3{}, o4{};
+    
+  float dx{}, dy{}, dz{}; // direction
+  
   float vx{}, vy{}, vz{};
   float width{};
   float length{};
@@ -29,22 +35,29 @@ struct FingerInfo
 
 struct HandInfo
 {
+  //who needs IDs ??
   int id{};
   float px{}, py{}, pz{};
+ 
+//quat
+  float o1{}, o2{}, o3{}, o4{};
+    
+//velocity
   float vx{}, vy{}, vz{};
 
-  float o1{}, o2{}, o3{}, o4{};
-
-  float radius{};
   float pinch{};
   float grab{};
+    
+  //float radius{};
+  float time{};
 };
 
 struct FrameInfo
 {
   int64_t frame{};
-  int64_t time{};
+  //int64_t time{};
   int hands{};
+  float framerate{};
 };
 
 struct UltraLeap
@@ -74,6 +87,10 @@ public:
     struct: halp::val_port<"Connected", bool> {
       halp_flag(class_attribute);
     } connected;
+      
+    struct: halp::val_port<"unit", std::string> {
+    halp_flag(class_attribute);
+    } unit;
   } inputs;
 
   struct
