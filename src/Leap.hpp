@@ -1,24 +1,22 @@
 #pragma once
 
 #include <LeapC.h>
+#include <boost/container/flat_map.hpp>
+#include <boost/container/small_vector.hpp>
+#include <boost/variant2.hpp>
 
-#include <cstdint>
 #include <cinttypes>
-#include <functional>
-#include <cstdlib>
+#include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <format>
-#include <mutex>
-#include <thread>
-#include <vector>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
-
-#include <boost/variant2.hpp>
-#include <boost/container/flat_map.hpp>
-#include <boost/container/small_vector.hpp>
+#include <thread>
+#include <vector>
 
 namespace ul
 {
@@ -37,7 +35,8 @@ struct device_info
 using head_message = LEAP_HEAD_POSE_EVENT;
 using eye_message = LEAP_EYE_EVENT;
 
-struct tracking_message {
+struct tracking_message
+{
   int64_t frame_id;
   int64_t timestamp;
 
@@ -70,7 +69,6 @@ struct subscriber
   explicit subscriber(subscriber_options&& opts) noexcept
       : config{std::move(opts)}
   {
-
   }
 };
 
@@ -78,9 +76,11 @@ using subscriber_handle = std::shared_ptr<subscriber>;
 
 struct leap_manager
 {
-  static constexpr LEAP_ALLOCATOR allocator = {
-      +[] (uint32_t size, eLeapAllocatorType typeHint, void* state) { return malloc(size); },
-      +[] (void* ptr, void* state) { free(ptr); }, nullptr };
+  static constexpr LEAP_ALLOCATOR allocator
+      = {+[](uint32_t size, eLeapAllocatorType typeHint, void* state) {
+    return malloc(size);
+  },
+         +[](void* ptr, void* state) { free(ptr); }, nullptr};
 
   leap_manager()
   {
@@ -91,7 +91,11 @@ struct leap_manager
       return;
 
     LeapSetAllocator(m_handle, &allocator);
-    LeapSetPolicyFlags(m_handle, eLeapPolicyFlag_Images | eLeapPolicyFlag_MapPoints | eLeapPolicyFlag_BackgroundFrames, 0);
+    LeapSetPolicyFlags(
+        m_handle,
+        eLeapPolicyFlag_Images | eLeapPolicyFlag_MapPoints
+            | eLeapPolicyFlag_BackgroundFrames,
+        0);
 
     m_running = true;
     m_thread = std::thread([this] {
@@ -112,26 +116,28 @@ struct leap_manager
     LeapDestroyConnection(m_handle);
   }
 
-  void register_device(const LEAP_DEVICE_EVENT *device_event)
+  void register_device(const LEAP_DEVICE_EVENT* device_event)
   {
     LEAP_DEVICE hdl{};
     auto res = LeapOpenDevice(device_event->device, &hdl);
-    if(res != eLeapRS_Success) {
+    if(res != eLeapRS_Success)
+    {
       return;
     }
 
     auto props = LEAP_DEVICE_INFO{
-        .size = sizeof(LEAP_DEVICE_INFO)
-      , .serial_length = 1
-      , .serial = (char*) malloc(1)
-    };
+        .size = sizeof(LEAP_DEVICE_INFO),
+        .serial_length = 1,
+        .serial = (char*)malloc(1)};
 
     // Most stupid little dance i've ever seen
     res = LeapGetDeviceInfo(hdl, &props);
-    if(res == eLeapRS_InsufficientBuffer){
+    if(res == eLeapRS_InsufficientBuffer)
+    {
       props.serial = (char*)realloc(props.serial, props.serial_length);
       res = LeapGetDeviceInfo(hdl, &props);
-      if(res != eLeapRS_Success){
+      if(res != eLeapRS_Success)
+      {
         free(props.serial);
         return;
       }
@@ -157,7 +163,8 @@ struct leap_manager
     LeapCloseDevice(hdl);
   }
 
-  void unregister_device(const LEAP_DEVICE_EVENT* device_event) {
+  void unregister_device(const LEAP_DEVICE_EVENT* device_event)
+  {
     std::lock_guard _{m_devices_lock};
     this->m_devices.erase(device_event->device.id);
   }
@@ -176,7 +183,8 @@ struct leap_manager
     if(result != eLeapRS_Success)
       return;
 
-    switch (msg.type) {
+    switch(msg.type)
+    {
       case eLeapEventType_Connection:
         m_connected = true;
         break;
@@ -273,7 +281,8 @@ struct leap_manager
     }
   }
 
-  void on_tracking_event(const LEAP_CONNECTION_MESSAGE& msg, const LEAP_TRACKING_EVENT *frame)
+  void
+  on_tracking_event(const LEAP_CONNECTION_MESSAGE& msg, const LEAP_TRACKING_EVENT* frame)
   {
     if(m_subscribers.empty() || m_devices.empty())
       return;
@@ -287,13 +296,14 @@ struct leap_manager
 
     m.framerate = frame->framerate;
 
-    for_each_subscriber(msg, [&] (subscriber& s) {
+    for_each_subscriber(msg, [&](subscriber& s) {
       if(s.config.on_tracking_event)
         s.config.on_tracking_event(m);
     });
   }
 
-  void on_head_event(const LEAP_CONNECTION_MESSAGE& msg, const LEAP_HEAD_POSE_EVENT* frame)
+  void
+  on_head_event(const LEAP_CONNECTION_MESSAGE& msg, const LEAP_HEAD_POSE_EVENT* frame)
   {
     if(m_subscribers.empty() || m_devices.empty())
       return;
@@ -344,7 +354,7 @@ private:
   boost::container::small_flat_map<uint32_t, device_info, 8> m_devices;
 };
 
-template<typename T>
+template <typename T>
 std::shared_ptr<T> instance()
 {
   static std::mutex mut;

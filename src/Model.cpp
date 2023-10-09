@@ -14,16 +14,12 @@ UltraLeap::~UltraLeap()
 
 void UltraLeap::initialize() noexcept
 {
-  m_handle = m_instance->subscribe({
-      .on_tracking_event = [this] (message m) {
-        this->msg.enqueue(std::move(m));
-        this->schedule.schedule_at(0, +[] (UltraLeap& self){
-              self();
-            });
-      }
-  });
+  m_handle = m_instance->subscribe({.on_tracking_event = [this](message m) {
+    this->msg.enqueue(std::move(m));
+    this->schedule.schedule_at(
+        0, +[](UltraLeap& self) { self(); });
+  }});
 }
-
 
 void UltraLeap::operator()() noexcept
 {
@@ -37,10 +33,9 @@ void UltraLeap::operator()() noexcept
       break;
   }
 
-  if(count > 0) {
-    boost::variant2::visit([this] (const auto& msg) {
-      this->on_message(msg);
-    }, m);
+  if(count > 0)
+  {
+    boost::variant2::visit([this](const auto& msg) { this->on_message(msg); }, m);
   }
 }
 
@@ -59,12 +54,12 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
   outputs.start_frame();
 
   const auto Nhand = msg.hands.size();
-  outputs.frame(
-      FrameInfo{ .frame = msg.frame_id
-          //, .time = 0
-          , .hands = int(Nhand)
-          , .framerate = msg.framerate
-      });
+  outputs.frame(FrameInfo{
+      .frame = msg.frame_id
+      //, .time = 0
+      ,
+      .hands = int(Nhand),
+      .framerate = msg.framerate});
 
   for(int i = 0; i < Nhand; i++)
   {
@@ -88,7 +83,7 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
     //oh.radius = ih.palm.width;
     oh.pinch = ih.pinch_strength;
     oh.grab = ih.grab_strength;
-    
+
     oh.time = ih.visible_time * 0.000001;
 
     if(ih.type == eLeapHandType::eLeapHandType_Left)
@@ -101,35 +96,38 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
     }
 
     int k = 0;
-    for(const auto& finger : ih.digits) {
+    for(const auto& finger : ih.digits)
+    {
       FingerInfo of;
-        
+
       of.id = finger.finger_id;
       //of.hand_id = ih.id;
       //of.id = 10 * of.hand_id + finger.finger_id;
-      
+
       of.px = finger.distal.next_joint.x;
       of.py = finger.distal.next_joint.y;
       of.pz = finger.distal.next_joint.z;
-        
-        //no quat for fingers ?
-        //of.o1 = finger.distal.orientation.x;
-        //of.o2 = finger.distal.orientation.y;
-        //of.o3 = finger.distal.orientation.z;
-        //of.o4 = finger.distal.orientation.w;
+
+      of.o1 = finger.distal.rotation.x;
+      of.o2 = finger.distal.rotation.y;
+      of.o3 = finger.distal.rotation.z;
+      of.o4 = finger.distal.rotation.w;
 
       of.dx = finger.distal.next_joint.x - finger.distal.prev_joint.x;
       of.dy = finger.distal.next_joint.y - finger.distal.prev_joint.y;
       of.dz = finger.distal.next_joint.z - finger.distal.prev_joint.z;
 
-      // of.vx = ih.palm.velocity.x;
-      // of.vy = ih.palm.velocity.y;
-      // of.vz = ih.palm.velocity.z;
+      // of.vx = 0.; // ih.palm.velocity.x;
+      // of.vy = 0.; // ih.palm.velocity.y;
+      // of.vz = 0.; // ih.palm.velocity.z;
 
-      of.width =  0.;
+      of.width = 0.;
       of.length = 0.;
-      for(auto& bone : finger.bones) {
-        auto len = std::hypot(bone.next_joint.x - bone.prev_joint.x, bone.next_joint.y - bone.prev_joint.y, bone.next_joint.z - bone.prev_joint.z);
+      for(auto& bone : finger.bones)
+      {
+        auto len = std::hypot(
+            bone.next_joint.x - bone.prev_joint.x, bone.next_joint.y - bone.prev_joint.y,
+            bone.next_joint.z - bone.prev_joint.z);
         of.length += len;
       }
       of.extended = finger.is_extended;

@@ -1,31 +1,28 @@
 #pragma once
 #include "Leap.hpp"
 
+#include <avnd/introspection/input.hpp>
 #include <concurrentqueue.h>
-
 #include <halp/callback.hpp>
 #include <halp/controls.hpp>
-#include <halp/schedule.hpp>
 #include <halp/meta.hpp>
+#include <halp/schedule.hpp>
 
 #include <vector>
-
-#include <avnd/introspection/input.hpp>
 
 namespace ul
 {
 struct FingerInfo
 {
-    
   int id{};
   //int hand_id{};
   float px{}, py{}, pz{}; //finger distal next_joint position
-  
-//quat
- //   float o1{}, o2{}, o3{}, o4{};
-    
+
+  //quat
+  float o1{}, o2{}, o3{}, o4{};
+
   float dx{}, dy{}, dz{}; // direction
-  
+
   float vx{}, vy{}, vz{};
   float width{};
   float length{};
@@ -38,16 +35,16 @@ struct HandInfo
   //who needs IDs ??
   int id{};
   float px{}, py{}, pz{};
- 
-//quat
+
+  //quat
   float o1{}, o2{}, o3{}, o4{};
-    
-//velocity
+
+  //velocity
   float vx{}, vy{}, vz{};
 
   float pinch{};
   float grab{};
-    
+
   //float radius{};
   float time{};
 };
@@ -72,24 +69,29 @@ public:
 
   struct
   {
-    struct : halp::val_port<"active", bool> {
+    struct : halp::val_port<"active", bool>
+    {
       halp_flag(class_attribute);
     } active;
 
-    struct : halp::val_port<"Device Index", int> {
+    struct : halp::val_port<"Device Index", int>
+    {
       halp_flag(class_attribute);
     } device_index;
 
-    struct: halp::val_port<"Device Serial", std::string> {
+    struct : halp::val_port<"Device Serial", std::string>
+    {
       halp_flag(class_attribute);
     } device_serial;
 
-    struct: halp::val_port<"Connected", bool> {
+    struct : halp::val_port<"Connected", bool>
+    {
       halp_flag(class_attribute);
     } connected;
-      
-    struct: halp::val_port<"unit", std::string> {
-    halp_flag(class_attribute);
+
+    struct : halp::val_port<"unit", std::string>
+    {
+      halp_flag(class_attribute);
     } unit;
   } inputs;
 
@@ -104,7 +106,8 @@ public:
     halp::callback<"Start frame"> start_frame;
   } outputs;
 
-  struct {
+  struct
+  {
     halp::scheduler_fun<UltraLeap&> schedule_at;
   } schedule;
 
@@ -121,7 +124,6 @@ public:
   ul::subscriber_handle m_handle;
 
   moodycamel::ConcurrentQueue<message> msg;
-
 };
 
 }
