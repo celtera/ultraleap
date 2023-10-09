@@ -105,6 +105,7 @@ jobs:
           repository: celtera/LeapSDK
           submodules: "recursive"
           path: LeapSDK
+          token: ${{ secrets.GIT_CLONE_TOKEN }}
 
       - name: Retrieve the secret and decode it to a file
         run: |
