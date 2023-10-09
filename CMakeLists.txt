@@ -20,11 +20,12 @@ target_link_libraries(UltraLeap PUBLIC
     LeapC::Leap
 )
 
-avnd_make_object(
+avnd_make(
   TARGET UltraLeap
   MAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/Model.hpp"
   MAIN_CLASS ul::UltraLeap
   C_NAME avnd_ultraleap
+  BACKENDS max
 )
 
 # Create a Max package

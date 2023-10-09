@@ -1,5 +1,13 @@
 include(FetchContent)
 
+# Boost
+FetchContent_Declare(
+  boost
+  URL "https://github.com/ossia/sdk/releases/download/sdk28/boost_1_83_0.tar.gz"
+)
+FetchContent_Populate(boost)
+set(BOOST_ROOT "${boost_SOURCE_DIR}")
+
 # Max/MSP sdk
 FetchContent_Declare(
   max_sdk
