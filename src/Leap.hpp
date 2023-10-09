@@ -20,7 +20,6 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/container/small_vector.hpp>
 
-#include <ext.h>
 namespace ul
 {
 struct device_info
