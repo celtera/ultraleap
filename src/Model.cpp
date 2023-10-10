@@ -131,15 +131,15 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
       of.o3 = finger.distal.rotation.z;
       of.o4 = finger.distal.rotation.w;
 
-      of.dx = finger.distal.next_joint.x - finger.distal.prev_joint.x;
-      of.dy = finger.distal.next_joint.y - finger.distal.prev_joint.y;
-      of.dz = finger.distal.next_joint.z - finger.distal.prev_joint.z;
+      //of.dx = finger.distal.next_joint.x - finger.distal.prev_joint.x;
+      //of.dy = finger.distal.next_joint.y - finger.distal.prev_joint.y;
+      //of.dz = finger.distal.next_joint.z - finger.distal.prev_joint.z;
 
       // of.vx = 0.; // ih.palm.velocity.x;
       // of.vy = 0.; // ih.palm.velocity.y;
       // of.vz = 0.; // ih.palm.velocity.z;
 
-      of.width = 0.;
+      //of.width = 0.;
       of.length = 0.;
       for(auto& bone : finger.bones)
       {
@@ -149,7 +149,8 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
         of.length += len;
       }
       of.extended = finger.is_extended;
-      of.type = k++;
+      
+        //of.type = k++;
 
       if(ih.type == eLeapHandType::eLeapHandType_Left)
       {

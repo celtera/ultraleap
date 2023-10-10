@@ -21,18 +21,18 @@ struct FingerInfo
   //quat
   float o1{}, o2{}, o3{}, o4{};
 
-  float dx{}, dy{}, dz{}; // direction
+  //float dx{}, dy{}, dz{}; // direction
 
   float vx{}, vy{}, vz{};
-  float width{};
-  float length{};
   int extended{};
-  int type{};
+  float length{};
+  //float width{};
+  //int type{};
 };
 
 struct HandInfo
 {
-  //who needs IDs ??
+  //who needs hands IDs ??
   int id{};
   float px{}, py{}, pz{};
 
