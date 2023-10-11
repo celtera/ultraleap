@@ -1,53 +1,33 @@
-# Avendish processor template !
+# Ultraleap Leap Motion Controller Max external
 
-This provides a basic, canonical template for making objects with [Avendish](https://github.com/celtera/avendish).
+Compatible with the Leap Motion Controller 1 & 2, Ultraleap 3Di Stereo,  IR 170 Evaluation Kit.
 
-Note that some libraries are needed to access the various back-ends. They can be passed to CMake.
+Requires [Gemini: Ultraleap Hand Tracking Software](https://leap2.ultraleap.com/gemini-downloads/)
 
-These instructions are mostly useful on Windows / macOS as on Linux one can just install the packages from the OS package manager.
 
-For instance, on Arch Linux:
+Build for [Max 8](https://cycling74.com/products/max) for Windows, Mac intel & arm64.
 
-```bash
-$ sudo pacman -S vst3sdk pd pybind11
+
+
+This external returns :
 ```
-
-will install things.
-
-To see a complete build procedure, one can refer to the [Github actions workflows](.github/workflows/), which compile 
-the project on clean virtual machines.
-
-## Python
- 
-[Get it there](https://github.com/pybind/pybind11) and pass to cmake:
-```cpp
--Dpybind11_DIR=path/to/pybind11
+frame_info : frame_id, left & right hands tracking status, device_framerate
+hands (palms) : position(xyz), orientation(quat), velocity(xyz), pinch, grab
+Fingers (tips) : position(xyz), orientation(quat), velocity(xyz), fingerExtended, fingerLength
 ```
+![ultraleap screenshot](/docs/ultraleap-screenshot.png?raw=true)
 
-## VST 3 SDK
+This external is built thanks to the [Avendish](https://github.com/celtera/avendish) library, which allows (among other amazing things) automatically generation of Max/MSP and PureData objects.
 
-[Get it there](https://github.com/steinbergmedia/vst3sdk) and pass to cmake:
 
-```cpp
--DVST3_SDK_ROOT=path/to/vst3
-```
-
-## Max SDK
-
-[Get it there](https://cycling74.com/downloads/sdk) and pass to cmake:
-```cmake
--DAVND_MAXSDK_PATH=path/to/maxsdk
-```
-
-## PureData
-
-[Get it there](https://github.com/pure-data/pure-data), build it, and pass to cmake:
-
-```cmake
--DCMAKE_PREFIX_PATH=path/to/the/folder/containing/m_pd.h
-```
 
 ## TODO
 
-* Support importing them with a package manager
-* Audio support for standalone
+- Add a « poll » mechanism : send a bang to return latest frame (to sync data to jitter rendering / VR / limit frame rate…)
+- Output all fingers joints / bones position & orientation (maybe as a dict, or jitter matrices ?…)
+- Output stereo camera images (jitter matrix / texture)
+- Support Multiple devices : Gemini allow multiple devices connected to the same computer. Select device by id.
+
+## Known issues
+Fingers velocity is currently not working (returns 0. 0. 0.)
+Ultraleap sdk doesn’t returns fingers velocity, so it should be computed internally.
