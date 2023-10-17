@@ -58,8 +58,8 @@ struct subscriber_options
   std::optional<uint32_t> tracked_device;
   std::optional<std::string> tracked_device_serial;
 
-  std::function<void(tracking_message)> on_tracking_event;
-  std::function<void(image_message)> on_image_event;
+  std::function<void(const tracking_message&)> on_tracking_event;
+  std::function<void(const image_message&)> on_image_event;
 };
 
 struct subscriber

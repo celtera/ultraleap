@@ -70,8 +70,9 @@ public:
 
   struct
   {
-    struct : halp::val_port<"active", bool>
+    struct : halp::val_port<"Active", bool>
     {
+      halp_meta(c_name, "active")
       halp_flag(class_attribute);
       void update(UltraLeap& obj) {
         obj.update_active();
@@ -80,21 +81,25 @@ public:
 
     struct : halp::val_port<"Device Index", int>
     {
+      halp_meta(c_name, "device_index")
       halp_flag(class_attribute);
     } device_index;
 
     struct : halp::val_port<"Device Serial", std::string>
     {
+      halp_meta(c_name, "device_serial")
       halp_flag(class_attribute);
     } device_serial;
 
     struct : halp::val_port<"Connected", bool>
     {
+      halp_meta(c_name, "connected")
       halp_flag(class_attribute);
     } connected;
 
-    struct : halp::val_port<"unit", std::string>
+    struct : halp::val_port<"Unit", std::string>
     {
+      halp_meta(c_name, "unit")
       halp_flag(class_attribute);
     } unit;
   } inputs;

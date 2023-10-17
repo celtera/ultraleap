@@ -15,7 +15,7 @@ UltraLeap::~UltraLeap()
 void UltraLeap::initialize() noexcept
 {
   m_active = this->inputs.active;
-  m_handle = m_instance->subscribe({.on_tracking_event = [this](message m) {
+  m_handle = m_instance->subscribe({.on_tracking_event = [this](const tracking_message& m) {
     if(!this->m_active.load(std::memory_order_acquire))
       return;
 
@@ -149,7 +149,7 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
         of.length += len;
       }
       of.extended = finger.is_extended;
-      
+
         //of.type = k++;
 
       if(ih.type == eLeapHandType::eLeapHandType_Left)
