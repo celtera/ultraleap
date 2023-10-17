@@ -13,6 +13,7 @@ add_library(UltraLeap STATIC
   src/Model.cpp
   src/Model.hpp
   src/Leap.hpp
+  src/TripleBuffer.hpp
 )
 
 target_link_libraries(UltraLeap PUBLIC

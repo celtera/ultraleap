@@ -1,8 +1,8 @@
 #pragma once
 #include "Leap.hpp"
+#include "TripleBuffer.hpp"
 
 #include <avnd/introspection/input.hpp>
-#include <concurrentqueue.h>
 #include <halp/callback.hpp>
 #include <halp/controls.hpp>
 #include <halp/meta.hpp>
@@ -126,15 +126,13 @@ public:
   void initialize() noexcept;
   void operator()() noexcept;
   void on_message(const tracking_message& msg) noexcept;
-  void on_message(const head_message& msg) noexcept;
-  void on_message(const eye_message& msg) noexcept;
 
   void update_active();
 
   std::shared_ptr<ul::leap_manager> m_instance;
   ul::subscriber_handle m_handle;
 
-  moodycamel::ConcurrentQueue<message> msg;
+  triple_buffer<tracking_message> buf;
 
   std::atomic_bool m_active{true};
 };

@@ -3,6 +3,7 @@
 #include <LeapC.h>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/small_vector.hpp>
+#include <boost/container/static_vector.hpp>
 #include <boost/variant2.hpp>
 
 #include <cinttypes>
@@ -40,7 +41,7 @@ struct tracking_message
   int64_t frame_id;
   int64_t timestamp;
 
-  std::vector<LEAP_HAND> hands;
+  boost::container::static_vector<LEAP_HAND, 2> hands;
   float framerate;
 };
 
@@ -50,8 +51,6 @@ struct image_message
   std::shared_ptr<unsigned char> left;
   std::shared_ptr<unsigned char> right;
 };
-
-using message = boost::variant2::variant<tracking_message, head_message, eye_message>;
 
 struct subscriber_options
 {

@@ -4,6 +4,7 @@ namespace ul
 {
 UltraLeap::UltraLeap()
     : m_instance{ul::instance<ul::leap_manager>()}
+    , buf{ {} }
 {
 }
 
@@ -16,42 +17,22 @@ void UltraLeap::initialize() noexcept
 {
   m_active = this->inputs.active;
   m_handle = m_instance->subscribe({.on_tracking_event = [this](const tracking_message& m) {
-    if(!this->m_active.load(std::memory_order_acquire))
-      return;
+    this->buf.produce(m);
 
-    this->msg.enqueue(std::move(m));
-    this->schedule.schedule_at(
-        0, +[](UltraLeap& self) { self(); });
+    if(this->m_active.load(std::memory_order_acquire)) {
+      this->schedule.schedule_at(
+          0, +[](UltraLeap& self) { self(); });
+    }
   }});
 }
 
+
 void UltraLeap::operator()() noexcept
 {
-  int count = 0;
-  message m;
-  for(int i = 0; i < 3; i++)
-  {
-    if(msg.try_dequeue(m))
-      count++;
-    else
-      break;
-  }
-
-  if(count > 0)
-  {
-    boost::variant2::visit([this](const auto& msg) { this->on_message(msg); }, m);
-  }
+  if(tracking_message m; this->buf.consume(m))
+    this->on_message(m);
 }
 
-void UltraLeap::on_message(const head_message& msg) noexcept
-{
-  // TODO
-}
-
-void UltraLeap::on_message(const eye_message& msg) noexcept
-{
-  // TODO
-}
 
 void UltraLeap::update_active()
 {
