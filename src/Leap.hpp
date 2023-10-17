@@ -156,7 +156,7 @@ struct leap_manager
       d.caps = props.caps;
       d.pid = props.pid;
       d.baseline = props.baseline;
-      d.serial = std::string(props.serial, props.serial_length);
+      d.serial = std::string(props.serial, props.serial_length - 1);
       d.h_fov = props.h_fov;
       d.v_fov = props.v_fov;
       d.range = props.range;

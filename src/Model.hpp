@@ -84,12 +84,18 @@ public:
     {
       halp_meta(c_name, "device_index")
       halp_flag(class_attribute);
+      void update(UltraLeap& obj) {
+        obj.initialize();
+      }
     } device_index;
 
     struct : halp::val_port<"Device Serial", std::string>
     {
       halp_meta(c_name, "device_serial")
       halp_flag(class_attribute);
+      void update(UltraLeap& obj) {
+        obj.initialize();
+      }
     } device_serial;
 
     struct : halp::val_port<"Connected", bool>
