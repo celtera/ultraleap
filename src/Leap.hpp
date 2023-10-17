@@ -83,7 +83,14 @@ struct leap_manager
 
   leap_manager()
   {
-    if(LeapCreateConnection(nullptr, &m_handle) != eLeapRS_Success)
+    LEAP_CONNECTION_CONFIG config;
+
+    // Set connection to multi-device aware
+    memset(&config, 0, sizeof(config));
+    config.size = sizeof(config);
+    config.flags = eLeapConnectionConfig_MultiDeviceAware;
+
+    if(LeapCreateConnection(&config, &m_handle) != eLeapRS_Success)
       return;
 
     if(LeapOpenConnection(m_handle) != eLeapRS_Success)
@@ -154,6 +161,7 @@ struct leap_manager
       d.v_fov = props.v_fov;
       d.range = props.range;
 
+      LeapSubscribeEvents(m_handle, hdl);
       std::lock_guard _{m_devices_lock};
       this->m_devices[device_event->device.id] = std::move(d);
     }
@@ -236,10 +244,8 @@ struct leap_manager
         // }
         break;
       case eLeapEventType_HeadPose:
-        on_head_event(msg, msg.head_pose_event);
         break;
       case eLeapEventType_Eyes:
-        on_eye_event(msg, msg.eye_event);
         break;
       case eLeapEventType_IMU:
         // msg.imu_event
@@ -247,6 +253,12 @@ struct leap_manager
       default:
         break;
     }
+  }
+
+  auto devices() const noexcept
+  {
+    std::lock_guard _{m_devices_lock};
+    return m_devices;
   }
 
   std::string device_serial(uint32_t id) const noexcept
@@ -286,7 +298,6 @@ struct leap_manager
     if(m_subscribers.empty() || m_devices.empty())
       return;
 
-    //post("Tracking event:\n  ID: %d\n  SN: %s", msg.device_id, device_serial(msg.device_id).c_str());
     tracking_message m;
     m.frame_id = frame->tracking_frame_id;
     m.timestamp = frame->info.timestamp;
@@ -299,23 +310,6 @@ struct leap_manager
       if(s.config.on_tracking_event)
         s.config.on_tracking_event(m);
     });
-  }
-
-  void
-  on_head_event(const LEAP_CONNECTION_MESSAGE& msg, const LEAP_HEAD_POSE_EVENT* frame)
-  {
-    if(m_subscribers.empty() || m_devices.empty())
-      return;
-
-    // TODO
-  }
-
-  void on_eye_event(const LEAP_CONNECTION_MESSAGE& msg, const LEAP_EYE_EVENT* frame)
-  {
-    if(m_subscribers.empty() || m_devices.empty())
-      return;
-
-    // TODO
   }
 
   void on_image_event(const LEAP_IMAGE_EVENT* frame)

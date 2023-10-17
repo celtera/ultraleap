@@ -6,6 +6,7 @@
 #include <halp/callback.hpp>
 #include <halp/controls.hpp>
 #include <halp/meta.hpp>
+#include <halp/messages.hpp>
 #include <halp/schedule.hpp>
 
 #include <vector>
@@ -114,6 +115,13 @@ public:
     halp::callback<"Frame", FrameInfo> frame;
     halp::callback<"Start frame"> start_frame;
   } outputs;
+
+  struct messages {
+    struct dump {
+      halp_meta(name, "dump")
+      void operator()(UltraLeap& self);
+    } dump;
+  };
 
   struct
   {

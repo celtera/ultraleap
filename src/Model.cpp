@@ -2,10 +2,47 @@
 
 namespace ul
 {
+static std::string_view product_name(eLeapDevicePID pid)
+{
+  switch(pid)
+  {
+    case eLeapDevicePID_Unknown: return "Unknown";
+    case eLeapDevicePID_Peripheral: return "Leap Motion Controller";
+    case eLeapDevicePID_Dragonfly: return "Dragonfly";
+    case eLeapDevicePID_Nightcrawler: return "Nightcrawler";
+    case eLeapDevicePID_Rigel: return "Rigel";
+    case eLeapDevicePID_SIR170: return "Ultraleap Stereo IR 170 ";
+    case eLeapDevicePID_3Di: return "Ultraleap 3Di";
+    case eLeapDevicePID_LMC2: return "Leap Motion Controller 2";
+    case eLeapDevicePID_Invalid: return "Invalid";
+    default: return "Unknown?";
+  }
+}
+void UltraLeap::messages::dump::operator()(UltraLeap& self)
+{
+  ul::device_info d;
+
+  const auto& devs = self.m_instance->devices();
+  int k = 0;
+  for(auto& [id, dev] : devs) {
+    post("UltraLeap Controller: %d", id);
+    post(" - index: %d", k++);
+    post(" - serial: %s", dev.serial.c_str());
+    post(" - product: %s", product_name(dev.pid).data());
+    post(" - status: %d", dev.status);
+    post(" - caps: %d", dev.caps);
+    post(" - baseline: %d", dev.baseline);
+    post(" - h_fov: %f", dev.h_fov);
+    post(" - v_fov: %f", dev.v_fov);
+    post(" - range: %f", dev.range);
+  }
+}
+
 UltraLeap::UltraLeap()
     : m_instance{ul::instance<ul::leap_manager>()}
     , buf{ {} }
 {
+  this->inputs.device_index.value = -1;
 }
 
 UltraLeap::~UltraLeap()
@@ -16,14 +53,28 @@ UltraLeap::~UltraLeap()
 void UltraLeap::initialize() noexcept
 {
   m_active = this->inputs.active;
-  m_handle = m_instance->subscribe({.on_tracking_event = [this](const tracking_message& m) {
-    this->buf.produce(m);
+  if(m_handle)
+    m_instance->unsubscribe(m_handle);
 
-    if(this->m_active.load(std::memory_order_acquire)) {
-      this->schedule.schedule_at(
-          0, +[](UltraLeap& self) { self(); });
-    }
-  }});
+  subscriber_options opt;
+  opt.on_tracking_event = [this](const tracking_message& m) {
+      this->buf.produce(m);
+
+      if(this->m_active.load(std::memory_order_acquire)) {
+        this->schedule.schedule_at(
+            0, +[](UltraLeap& self) { self(); });
+      }
+  };
+
+  if(!this->inputs.device_serial.value.empty())
+  {
+    opt.tracked_device_serial = this->inputs.device_serial.value;
+  }
+  else if(this->inputs.device_index.value >= 0)
+  {
+    opt.tracked_device = this->inputs.device_index.value;
+  }
+  m_handle = m_instance->subscribe(std::move(opt));
 }
 
 
