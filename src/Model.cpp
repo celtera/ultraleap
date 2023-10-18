@@ -1,5 +1,7 @@
 #include "Model.hpp"
 #include <ext.h>
+#include <halp/attributes.hpp>
+
 namespace ul
 {
 static std::string_view product_name(eLeapDevicePID pid)
@@ -50,7 +52,13 @@ UltraLeap::~UltraLeap()
   m_instance->unsubscribe(m_handle);
 }
 
-void UltraLeap::initialize() noexcept
+void UltraLeap::initialize(std::span<std::variant<float, std::string_view>> range) noexcept
+{
+  halp::parse_attributes(*this, range);
+  restart_tracking();
+}
+
+void UltraLeap::restart_tracking()
 {
   m_active = this->inputs.active;
   if(m_handle)

@@ -85,7 +85,7 @@ public:
       halp_meta(c_name, "device_index")
       halp_flag(class_attribute);
       void update(UltraLeap& obj) {
-        obj.initialize();
+        obj.restart_tracking();
       }
     } device_index;
 
@@ -94,7 +94,7 @@ public:
       halp_meta(c_name, "device_serial")
       halp_flag(class_attribute);
       void update(UltraLeap& obj) {
-        obj.initialize();
+        obj.restart_tracking();
       }
     } device_serial;
 
@@ -137,11 +137,11 @@ public:
   UltraLeap();
   ~UltraLeap();
 
-  void initialize() noexcept;
+  void initialize(std::span<std::variant<float, std::string_view>>) noexcept;
+  void restart_tracking();
+  void update_active();
   void operator()() noexcept;
   void on_message(const tracking_message& msg) noexcept;
-
-  void update_active();
 
   std::shared_ptr<ul::leap_manager> m_instance;
   ul::subscriber_handle m_handle;

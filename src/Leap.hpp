@@ -6,6 +6,7 @@
 #include <boost/container/static_vector.hpp>
 #include <boost/variant2.hpp>
 
+#include <ext.h>
 #include <cinttypes>
 #include <cstdint>
 #include <cstdio>
