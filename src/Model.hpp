@@ -13,6 +13,21 @@
 
 namespace ul
 {
+
+struct BoneInfo
+{
+  int fid{};    //int finger_id{};
+    int bid{}; //bone ID;
+
+  float ppx{}, ppy{}, ppz{}; //bone prev_joint position
+
+  float o1{}, o2{}, o3{}, o4{};    //quat
+float pnx{}, pny{}, pnz{}; //bone next_joint position
+    
+    float w{};
+    float l{};
+};
+
 struct FingerInfo
 {
   int id{};
@@ -114,6 +129,8 @@ public:
   struct
   {
     halp::callback<"End frame"> end_frame;
+    halp::callback<"Bones L", BoneInfo> bone_l;
+    halp::callback<"Bones R", BoneInfo> bone_r;
     halp::callback<"Finger L", FingerInfo> finger_l;
     halp::callback<"Finger R", FingerInfo> finger_r;
     halp::callback<"Hand L", HandInfo> hand_l;

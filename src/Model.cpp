@@ -158,6 +158,7 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
     {
       FingerInfo of;
 
+
       of.id = finger.finger_id;
       //of.hand_id = ih.id;
       //of.id = 10 * of.hand_id + finger.finger_id;
@@ -181,12 +182,47 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
 
       //of.width = 0.;
       of.length = 0.;
+       
+        BoneInfo ob;
+        int boneID = 0;
+        
       for(auto& bone : finger.bones)
       {
         auto len = std::hypot(
             bone.next_joint.x - bone.prev_joint.x, bone.next_joint.y - bone.prev_joint.y,
             bone.next_joint.z - bone.prev_joint.z);
         of.length += len;
+          
+          ob.fid = of.id;
+
+          ob.bid = boneID;
+          boneID += 1;
+	    
+        ob.ppx = bone.prev_joint.x;
+        ob.ppy = bone.prev_joint.y;
+        ob.ppz = bone.prev_joint.z;
+
+        ob.o1 = bone.rotation.x;
+        ob.o2 = bone.rotation.y;
+        ob.o3 = bone.rotation.z;
+        ob.o4 = bone.rotation.w;
+          
+          ob.pnx = bone.next_joint.x;
+          ob.pny = bone.next_joint.y;
+          ob.pnz = bone.next_joint.z;
+          
+          ob.w = bone.width;
+          ob.l = len;
+          
+          if(ih.type == eLeapHandType::eLeapHandType_Left)
+          {
+            outputs.bone_l(ob);
+          }
+          else
+          {
+            outputs.bone_r(ob);
+          }
+		
       }
       of.extended = finger.is_extended;
 
@@ -195,14 +231,20 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
       if(ih.type == eLeapHandType::eLeapHandType_Left)
       {
         outputs.finger_l(of);
+
       }
       else
       {
         outputs.finger_r(of);
+
       }
     }
+	
+	
   }
 
+
+    
   outputs.end_frame();
 }
 }
