@@ -17,15 +17,15 @@ namespace ul
 struct BoneInfo
 {
   int fid{};    //int finger_id{};
-    int bid{}; //bone ID;
+  int bid{}; //bone ID;
 
   float ppx{}, ppy{}, ppz{}; //bone prev_joint position
 
   float o1{}, o2{}, o3{}, o4{};    //quat
-float pnx{}, pny{}, pnz{}; //bone next_joint position
+  float pnx{}, pny{}, pnz{}; //bone next_joint position
     
-    float w{};
-    float l{};
+  float w{}; //bone width
+  float l{}; //bone length
 };
 
 struct FingerInfo
