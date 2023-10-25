@@ -27,7 +27,7 @@ avnd_make(
   MAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/Model.hpp"
   MAIN_CLASS ul::UltraLeap
   C_NAME ultraleap
-  BACKENDS max
+  BACKENDS "dump;max"
 )
 
 # Create a Max package
