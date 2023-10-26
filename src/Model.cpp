@@ -4,6 +4,17 @@
 
 namespace ul
 {
+
+static double distance_conversion_factor(std::string_view unit) {
+  if(unit == "m") {
+    return 0.001;
+  } else if(unit == "mm") {
+    return 1.;
+  } else {
+    return 1.;
+  }
+}
+
 static std::string_view product_name(eLeapDevicePID pid)
 {
   switch(pid)
@@ -100,6 +111,9 @@ void UltraLeap::update_active()
 
 void UltraLeap::on_message(const tracking_message& msg) noexcept
 {
+    
+    auto factor = distance_conversion_factor(this->inputs.unit.value);
+    
   outputs.start_frame();
 
   const int Nhand = msg.hands.size();
@@ -125,13 +139,13 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
     HandInfo oh;
     oh.id = ih.id;
 
-    oh.px = ih.palm.position.x;
-    oh.py = ih.palm.position.y;
-    oh.pz = ih.palm.position.z;
+    oh.px = ih.palm.position.x * factor;
+    oh.py = ih.palm.position.y * factor;
+    oh.pz = ih.palm.position.z * factor;
 
-    oh.vx = ih.palm.velocity.x;
-    oh.vy = ih.palm.velocity.y;
-    oh.vz = ih.palm.velocity.z;
+    oh.vx = ih.palm.velocity.x * factor;
+    oh.vy = ih.palm.velocity.y * factor;
+    oh.vz = ih.palm.velocity.z * factor;
 
     oh.o1 = ih.palm.orientation.x;
     oh.o2 = ih.palm.orientation.y;
@@ -163,9 +177,9 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
       //of.hand_id = ih.id;
       //of.id = 10 * of.hand_id + finger.finger_id;
 
-      of.px = finger.distal.next_joint.x;
-      of.py = finger.distal.next_joint.y;
-      of.pz = finger.distal.next_joint.z;
+      of.px = finger.distal.next_joint.x * factor;
+      of.py = finger.distal.next_joint.y * factor;
+      of.pz = finger.distal.next_joint.z * factor;
 
       of.o1 = finger.distal.rotation.x;
       of.o2 = finger.distal.rotation.y;
@@ -191,28 +205,28 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
         auto len = std::hypot(
             bone.next_joint.x - bone.prev_joint.x, bone.next_joint.y - bone.prev_joint.y,
             bone.next_joint.z - bone.prev_joint.z);
-        of.length += len;
+        of.length += len * factor;
           
         ob.fid = of.id;
 
         ob.bid = boneID;
         boneID += 1;
 	    
-        ob.ppx = bone.prev_joint.x;
-        ob.ppy = bone.prev_joint.y;
-        ob.ppz = bone.prev_joint.z;
+        ob.ppx = bone.prev_joint.x * factor;
+        ob.ppy = bone.prev_joint.y * factor;
+        ob.ppz = bone.prev_joint.z * factor;
 
         ob.o1 = bone.rotation.x;
         ob.o2 = bone.rotation.y;
         ob.o3 = bone.rotation.z;
         ob.o4 = bone.rotation.w;
           
-        ob.pnx = bone.next_joint.x;
-        ob.pny = bone.next_joint.y;
-        ob.pnz = bone.next_joint.z;
+        ob.pnx = bone.next_joint.x * factor;
+        ob.pny = bone.next_joint.y * factor;
+        ob.pnz = bone.next_joint.z * factor;
           
-        ob.w = bone.width;
-        ob.l = len;
+        ob.w = bone.width * factor;
+        ob.l = len * factor;
           
         if(ih.type == eLeapHandType::eLeapHandType_Left)
           {
