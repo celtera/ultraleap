@@ -5,8 +5,8 @@
 #include <boost/container/small_vector.hpp>
 #include <boost/container/static_vector.hpp>
 #include <boost/variant2.hpp>
-
 #include <ext.h>
+
 #include <cinttypes>
 #include <cstdint>
 #include <cstdio>
@@ -78,8 +78,8 @@ struct leap_manager
 {
   static constexpr LEAP_ALLOCATOR allocator
       = {+[](uint32_t size, eLeapAllocatorType typeHint, void* state) {
-    return malloc(size);
-  },
+           return malloc(size);
+         },
          +[](void* ptr, void* state) { free(ptr); }, nullptr};
 
   leap_manager()

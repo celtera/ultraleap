@@ -23,7 +23,7 @@ public:
     stale.clear();
   }
 
-  template<typename U>
+  template <typename U>
   void produce(U&& t)
   {
     using namespace std;
@@ -31,9 +31,13 @@ public:
     // Load the data in the buffer
     auto& old = *to_write.load();
     if constexpr(std::is_const_v<U>)
-    { swap(old, t); }
+    {
+      swap(old, t);
+    }
     else
-    { old = std::forward<U>(t); }
+    {
+      old = std::forward<U>(t);
+    }
 
     // Perform the buffer swap: ready <-> to_write
     auto p = buffer.exchange(to_write);
@@ -43,7 +47,7 @@ public:
     stale.clear();
   }
 
-  template<typename U>
+  template <typename U>
   bool consume(U&& res)
   {
     // Check if new data is available
