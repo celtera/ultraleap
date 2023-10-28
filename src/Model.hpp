@@ -5,8 +5,8 @@
 #include <avnd/introspection/input.hpp>
 #include <halp/callback.hpp>
 #include <halp/controls.hpp>
-#include <halp/meta.hpp>
 #include <halp/messages.hpp>
+#include <halp/meta.hpp>
 #include <halp/schedule.hpp>
 
 #include <vector>
@@ -16,14 +16,14 @@ namespace ul
 
 struct BoneInfo
 {
-  int fid{};    //int finger_id{};
+  int fid{}; //int finger_id{};
   int bid{}; //bone ID;
 
   float ppx{}, ppy{}, ppz{}; //bone prev_joint position
 
-  float o1{}, o2{}, o3{}, o4{};    //quat
-  float pnx{}, pny{}, pnz{}; //bone next_joint position
-    
+  float o1{}, o2{}, o3{}, o4{}; //quat
+  float pnx{}, pny{}, pnz{};    //bone next_joint position
+
   float w{}; //bone width
   float l{}; //bone length
 };
@@ -90,27 +90,21 @@ public:
     {
       halp_meta(c_name, "active")
       halp_flag(class_attribute);
-      void update(UltraLeap& obj) {
-        obj.update_active();
-      }
+      void update(UltraLeap& obj) { obj.update_active(); }
     } active;
 
     struct : halp::val_port<"Device Index", int>
     {
       halp_meta(c_name, "device_index")
       halp_flag(class_attribute);
-      void update(UltraLeap& obj) {
-        obj.restart_tracking();
-      }
+      void update(UltraLeap& obj) { obj.restart_tracking(); }
     } device_index;
 
     struct : halp::val_port<"Device Serial", std::string>
     {
       halp_meta(c_name, "device_serial")
       halp_flag(class_attribute);
-      void update(UltraLeap& obj) {
-        obj.restart_tracking();
-      }
+      void update(UltraLeap& obj) { obj.restart_tracking(); }
     } device_serial;
 
     struct : halp::val_port<"Connected", bool>
@@ -139,8 +133,10 @@ public:
     halp::callback<"Start frame"> start_frame;
   } outputs;
 
-  struct messages {
-    struct dump {
+  struct messages
+  {
+    struct dump
+    {
       halp_meta(name, "dump")
       void operator()(UltraLeap& self);
     } dump;
