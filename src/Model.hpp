@@ -131,6 +131,7 @@ public:
     halp::callback<"Hand R", HandInfo> hand_r;
     halp::callback<"Frame", FrameInfo> frame;
     halp::callback<"Start frame"> start_frame;
+    halp::callback<"Dump", std::string> dump;
   } outputs;
 
   struct messages

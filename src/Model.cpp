@@ -1,6 +1,7 @@
 #include "Model.hpp"
 
 #include <ext.h>
+#include <fmt/format.h>
 #include <halp/attributes.hpp>
 
 namespace ul
@@ -50,23 +51,24 @@ static std::string_view product_name(eLeapDevicePID pid)
 }
 void UltraLeap::messages::dump::operator()(UltraLeap& self)
 {
-  ul::device_info d;
-
   const auto& devs = self.m_instance->devices();
+
+  outputs.dump("dump.begin");
   int k = 0;
   for(auto& [id, dev] : devs)
   {
-    post("UltraLeap Controller: %d", id);
-    post(" - index: %d", k++);
-    post(" - serial: %s", dev.serial.c_str());
-    post(" - product: %s", product_name(dev.pid).data());
-    post(" - status: %d", dev.status);
-    post(" - caps: %d", dev.caps);
-    post(" - baseline: %d", dev.baseline);
-    post(" - h_fov: %f", dev.h_fov);
-    post(" - v_fov: %f", dev.v_fov);
-    post(" - range: %f", dev.range);
+    outputs.dump(fmt::format("device {}", id));
+    outputs.dump(fmt::format("index {}", k++));
+    outputs.dump(fmt::format("serial {}", dev.serial));
+    outputs.dump(fmt::format("product {}", product_name(dev.pid)));
+    outputs.dump(fmt::format("status {}", dev.status));
+    outputs.dump(fmt::format("caps {}", dev.caps));
+    outputs.dump(fmt::format("baseline {}", dev.baseline));
+    outputs.dump(fmt::format("h_fov {}", dev.h_fov));
+    outputs.dump(fmt::format("v_fov {}", dev.v_fov));
+    outputs.dump(fmt::format("range {}", dev.range));
   }
+  outputs.dump("dump.end");
 }
 
 UltraLeap::UltraLeap()
