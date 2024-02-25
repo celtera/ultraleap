@@ -49,10 +49,12 @@ static std::string_view product_name(eLeapDevicePID pid)
       return "Unknown?";
   }
 }
+
 void UltraLeap::messages::dump::operator()(UltraLeap& self)
 {
   const auto& devs = self.m_instance->devices();
 
+  auto& outputs = self.outputs;
   outputs.dump("dump.begin");
   int k = 0;
   for(auto& [id, dev] : devs)
