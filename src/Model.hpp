@@ -103,6 +103,7 @@ public:
     struct : halp::val_port<"Device Serial", std::string>
     {
       halp_meta(c_name, "device_serial")
+      halp_meta(description, "Serial number of the UltraLeap device to bind to.")
       halp_flag(class_attribute);
       void update(UltraLeap& obj) { obj.restart_tracking(); }
     } device_serial;
@@ -122,16 +123,36 @@ public:
 
   struct
   {
-    halp::callback<"End frame"> end_frame;
-    halp::callback<"Bones L", BoneInfo> bone_l;
-    halp::callback<"Bones R", BoneInfo> bone_r;
-    halp::callback<"Finger L", FingerInfo> finger_l;
-    halp::callback<"Finger R", FingerInfo> finger_r;
-    halp::callback<"Hand L", HandInfo> hand_l;
-    halp::callback<"Hand R", HandInfo> hand_r;
-    halp::callback<"Frame", FrameInfo> frame;
-    halp::callback<"Start frame"> start_frame;
-    halp::callback<"Dump", std::string> dump;
+    struct : halp::callback<"End frame"> {
+      halp_meta(description, "A message is sent through this outlet when the frame has been fully processed.")
+    } end_frame;
+    struct : halp::callback<"Bones L", BoneInfo>    {
+      halp_meta(description, ".")
+    } bone_l;
+    struct : halp::callback<"Bones R", BoneInfo>    {
+      halp_meta(description, ".")
+    } bone_r;
+    struct : halp::callback<"Finger L", FingerInfo> {
+      halp_meta(description, ".")
+    } finger_l;
+    struct : halp::callback<"Finger R", FingerInfo> {
+      halp_meta(description, ".")
+    } finger_r;
+    struct : halp::callback<"Hand L", HandInfo>     {
+      halp_meta(description, ".")
+    } hand_l;
+    struct : halp::callback<"Hand R", HandInfo>     {
+      halp_meta(description, ".")
+    } hand_r;
+    struct : halp::callback<"Frame", FrameInfo>     {
+      halp_meta(description, ".")
+    } frame;
+    struct : halp::callback<"Start frame"> {
+      halp_meta(description, "A message is sent through this outlet when a new frame is going to be processed.")
+    } start_frame;
+    struct : halp::callback<"Dump", std::string> {
+      halp_meta(description, "Dump out.")
+    } dump;
   } outputs;
 
   struct messages
