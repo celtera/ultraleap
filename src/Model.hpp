@@ -182,7 +182,15 @@ public:
   ul::subscriber_handle m_handle;
 
   triple_buffer<tracking_message> buf;
+  
+  struct Fingers {
+    int hand_id{-1};
+    FingerInfo fingers[5];
+  };
+  Fingers prev_left_hand;
+  Fingers prev_right_hand;
 
+  std::chrono::steady_clock::time_point prev_frame_time{};
   std::atomic_bool m_active{true};
 };
 

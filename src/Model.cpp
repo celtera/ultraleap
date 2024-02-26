@@ -133,8 +133,10 @@ void UltraLeap::update_active()
 
 void UltraLeap::on_message(const tracking_message& msg) noexcept
 {
-
-  auto factor = distance_conversion_factor(this->inputs.unit.value);
+  const auto frame_time = std::chrono::steady_clock::now();
+  const auto frame_diff = std::chrono::duration_cast<std::chrono::nanoseconds>(frame_time - prev_frame_time).count();
+  const auto inv_frame_rate = (frame_diff > 1e9 || frame_diff <= 1e3) ? 0. : 1e9 / frame_diff;
+  const auto factor = distance_conversion_factor(this->inputs.unit.value);
 
   outputs.start_frame();
 
@@ -154,7 +156,25 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
       frameInfo.rightHandTracked = true;
   }
 
+  if(!frameInfo.leftHandTracked)
+    prev_left_hand.hand_id = -1;
+  if(!frameInfo.rightHandTracked)
+    prev_right_hand.hand_id = -1;
+
   outputs.frame(frameInfo);
+
+  auto update_speed = [=] (Fingers& prev, int hand, int finger, FingerInfo& of)
+  {
+    if(prev.hand_id == hand && inv_frame_rate > 0.)
+    {
+      const auto& pf = prev.fingers[finger];
+
+      of.vx = (of.px - pf.px) * inv_frame_rate;
+      of.vy = (of.py - pf.py) * inv_frame_rate;
+      of.vz = (of.pz - pf.pz) * inv_frame_rate;
+    }
+    prev.fingers[finger] = of;
+  };
 
   for(int i = 0; i < Nhand; i++)
   {
@@ -190,7 +210,7 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
       outputs.hand_r(oh);
     }
 
-    int k = 0;
+    int finger_index = 0;
     for(const auto& finger : ih.digits)
     {
       FingerInfo of;
@@ -212,6 +232,7 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
       //of.dy = finger.distal.next_joint.y - finger.distal.prev_joint.y;
       //of.dz = finger.distal.next_joint.z - finger.distal.prev_joint.z;
 
+      // Updated later
       // of.vx = 0.; // ih.palm.velocity.x;
       // of.vy = 0.; // ih.palm.velocity.y;
       // of.vz = 0.; // ih.palm.velocity.z;
@@ -251,30 +272,34 @@ void UltraLeap::on_message(const tracking_message& msg) noexcept
         ob.l = len * factor;
 
         if(ih.type == eLeapHandType::eLeapHandType_Left)
-        {
           outputs.bone_l(ob);
-        }
         else
-        {
           outputs.bone_r(ob);
-        }
       }
 
       of.extended = finger.is_extended;
 
-      //of.type = k++;
-
       if(ih.type == eLeapHandType::eLeapHandType_Left)
       {
+        update_speed(prev_left_hand, oh.id, finger_index, of);
         outputs.finger_l(of);
       }
       else
       {
+        update_speed(prev_right_hand, oh.id, finger_index, of);
         outputs.finger_r(of);
       }
+      ++finger_index;
     }
+
+    // For speed computation on the next turn
+    if(ih.type == eLeapHandType::eLeapHandType_Left)
+      prev_left_hand.hand_id = ih.id;
+    else
+      prev_right_hand.hand_id = ih.id;
   }
 
   outputs.end_frame();
+  prev_frame_time = frame_time;
 }
 }
