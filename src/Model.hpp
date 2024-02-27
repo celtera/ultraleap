@@ -150,7 +150,7 @@ public:
     struct : halp::callback<"Start frame"> {
       halp_meta(description, "A message is sent through this outlet when a new frame is going to be processed.")
     } start_frame;
-    struct : halp::callback<"Dump", std::string> {
+    struct : halp::callback<"Dump", std::vector<std::string>> {
       halp_meta(description, "Dump out.")
     } dump;
   } outputs;

@@ -52,25 +52,26 @@ static std::string_view product_name(eLeapDevicePID pid)
 
 void UltraLeap::messages::dump::operator()(UltraLeap& self)
 {
+  using strings = std::vector<std::string>;
   const auto& devs = self.m_instance->devices();
 
   auto& outputs = self.outputs;
-  outputs.dump("dump.begin");
+  outputs.dump(strings{"dump.begin"});
   int k = 0;
   for(auto& [id, dev] : devs)
   {
-    outputs.dump(fmt::format("device {}", id));
-    outputs.dump(fmt::format("index {}", k++));
-    outputs.dump(fmt::format("serial {}", dev.serial));
-    outputs.dump(fmt::format("product {}", product_name(dev.pid)));
-    outputs.dump(fmt::format("status {}", dev.status));
-    outputs.dump(fmt::format("caps {}", dev.caps));
-    outputs.dump(fmt::format("baseline {}", dev.baseline));
-    outputs.dump(fmt::format("h_fov {}", dev.h_fov));
-    outputs.dump(fmt::format("v_fov {}", dev.v_fov));
-    outputs.dump(fmt::format("range {}", dev.range));
+    outputs.dump(strings{"device", fmt::format("{}", id)});
+    outputs.dump(strings{"index", fmt::format("{}", k++)});
+    outputs.dump(strings{"serial", fmt::format("{}", dev.serial)});
+    outputs.dump(strings{"product", fmt::format("{}", product_name(dev.pid))});
+    outputs.dump(strings{"status", fmt::format("{}", dev.status)});
+    outputs.dump(strings{"caps", fmt::format("{}", dev.caps)});
+    outputs.dump(strings{"baseline", fmt::format("{}", dev.baseline)});
+    outputs.dump(strings{"h_fov", fmt::format("{}", dev.h_fov)});
+    outputs.dump(strings{"v_fov", fmt::format("{}", dev.v_fov)});
+    outputs.dump(strings{"range", fmt::format("{}", dev.range)});
   }
-  outputs.dump("dump.end");
+  outputs.dump(strings{"dump.end"});
 }
 
 UltraLeap::UltraLeap()
