@@ -132,7 +132,7 @@ public:
   struct
   {
     struct : halp::callback<"End frame"> {
-      halp_meta(description, "A message is sent through this outlet when the frame has been fully processed.")
+      halp_meta(description, "End frame : A bang is sent through this outlet when the frame has been fully processed.")
     } end_frame;
     struct : halp::callback<"Bones L", BoneInfo>    {
       halp_meta(description, "Left hand bones")
@@ -153,10 +153,10 @@ public:
       halp_meta(description, "Right hand")
     } hand_r;
     struct : halp::callback<"Frame", FrameInfo>     {
-      halp_meta(description, ".")
+      halp_meta(description, "Frame infos")
     } frame;
     struct : halp::callback<"Start frame"> {
-      halp_meta(description, "A message is sent through this outlet when a new frame is going to be processed.")
+      halp_meta(description, "Start frame : A bang is sent through this outlet when a new frame is going to be processed.")
     } start_frame;
 
     struct : halp::callback<"Dump", std::vector<dump_type>> {
