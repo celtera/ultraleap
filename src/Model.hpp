@@ -91,6 +91,7 @@ public:
     struct : halp::val_port<"Active", bool>
     {
       halp_meta(c_name, "active")
+      halp_meta(description, "Data will be streamed when this is enabled.")
       halp_flag(class_attribute);
       void update(UltraLeap& obj) { obj.update_active(); }
     } active;
@@ -98,6 +99,7 @@ public:
     struct : halp::val_port<"Device Index", int>
     {
       halp_meta(c_name, "device_index")
+      halp_meta(description, "Index of the UltraLeap device to bind to.")
       halp_flag(class_attribute);
       void update(UltraLeap& obj) { obj.restart_tracking(); }
     } device_index;
@@ -107,18 +109,22 @@ public:
       halp_meta(c_name, "device_serial")
       halp_meta(description, "Serial number of the UltraLeap device to bind to.")
       halp_flag(class_attribute);
-      void update(UltraLeap& obj) { obj.restart_tracking(); }
+      void update(UltraLeap& obj) {
+        obj.restart_tracking();
+      }
     } device_serial;
 
     struct : halp::val_port<"Connected", bool>
     {
       halp_meta(c_name, "connected")
+      halp_meta(description, "True when connected to a device.")
       halp_flag(class_attribute);
     } connected;
 
     struct : halp::val_port<"Unit", std::string>
     {
       halp_meta(c_name, "unit")
+      halp_meta(description, "Distance unit: m or mm.")
       halp_flag(class_attribute);
     } unit;
   } inputs;
@@ -129,22 +135,22 @@ public:
       halp_meta(description, "A message is sent through this outlet when the frame has been fully processed.")
     } end_frame;
     struct : halp::callback<"Bones L", BoneInfo>    {
-      halp_meta(description, ".")
+      halp_meta(description, "Left hand bones")
     } bone_l;
     struct : halp::callback<"Bones R", BoneInfo>    {
-      halp_meta(description, ".")
+      halp_meta(description, "Right hand bones")
     } bone_r;
     struct : halp::callback<"Finger L", FingerInfo> {
-      halp_meta(description, ".")
+      halp_meta(description, "Left hand fingers")
     } finger_l;
     struct : halp::callback<"Finger R", FingerInfo> {
-      halp_meta(description, ".")
+      halp_meta(description, "Right hand fingers")
     } finger_r;
     struct : halp::callback<"Hand L", HandInfo>     {
-      halp_meta(description, ".")
+      halp_meta(description, "Left hand")
     } hand_l;
     struct : halp::callback<"Hand R", HandInfo>     {
-      halp_meta(description, ".")
+      halp_meta(description, "Right hand")
     } hand_r;
     struct : halp::callback<"Frame", FrameInfo>     {
       halp_meta(description, ".")
