@@ -9,6 +9,7 @@
 #include <halp/meta.hpp>
 #include <halp/schedule.hpp>
 
+#include <variant>
 #include <vector>
 
 namespace ul
@@ -74,6 +75,7 @@ struct FrameInfo
   float framerate{};
 };
 
+using dump_type = std::variant<std::string, int, float>;
 struct UltraLeap
 {
 public:
@@ -150,7 +152,8 @@ public:
     struct : halp::callback<"Start frame"> {
       halp_meta(description, "A message is sent through this outlet when a new frame is going to be processed.")
     } start_frame;
-    struct : halp::callback<"Dump", std::vector<std::string>> {
+
+    struct : halp::callback<"Dump", std::vector<dump_type>> {
       halp_meta(description, "Dump out.")
     } dump;
   } outputs;
