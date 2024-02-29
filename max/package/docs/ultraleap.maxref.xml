@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes'?>
+<?xml-stylesheet href="./c74ref.xsl" type="text/xsl"?>
+
+<c74object
+  name="ultraleap"
+category="Devices"   >
+
+	<digest>Process UltraLeap hand tracking data.</digest>
+	<description>This external returns Ultraleap hand tracking frames.
+		Compatible with the Leap Motion Controller 1 or 2, Ultraleap 3Di Stereo, IR 170 Evaluation Kit.<br/>
+		Requires Gemini: Ultraleap Hand Tracking Software v5.x
+	</description>
+
+
+	<!--METADATA-->
+
+	<metadatalist>
+		<metadata name='author'>"Jean-Michaël Celerier - Mathieu Chamagne"</metadata>
+		<metadata name='tag'>ultraleap</metadata>
+		<metadata name='tag'>hand tracking</metadata>
+	</metadatalist>
+
+	<!--OUTLETS-->
+    <outletlist>
+      <outlet id="1" name="End frame" type="atom">
+        <digest>A message is sent through this outlet when the frame has been fully processed.</digest>
+        <description>A message is sent through this outlet when the frame has been fully processed.</description>
+      </outlet>
+      <outlet id="2" name="Bones L" type="atom">
+        <digest>Left hand bones</digest>
+        <description>Left hand bones</description>
+      </outlet>
+      <outlet id="3" name="Bones R" type="atom">
+        <digest>Right hand bones</digest>
+        <description>Right hand bones</description>
+      </outlet>
+      <outlet id="4" name="Finger L" type="atom">
+        <digest>Left hand fingers</digest>
+        <description>Left hand fingers</description>
+      </outlet>
+      <outlet id="5" name="Finger R" type="atom">
+        <digest>Right hand fingers</digest>
+        <description>Right hand fingers</description>
+      </outlet>
+      <outlet id="6" name="Hand L" type="atom">
+        <digest>Left hand</digest>
+        <description>Left hand</description>
+      </outlet>
+      <outlet id="7" name="Hand R" type="atom">
+        <digest>Right hand</digest>
+        <description>Right hand</description>
+      </outlet>
+      <outlet id="8" name="Frame" type="atom">
+        <digest>.</digest>
+        <description>.</description>
+      </outlet>
+      <outlet id="9" name="Start frame" type="atom">
+        <digest>A message is sent through this outlet when a new frame is going to be processed.</digest>
+        <description>A message is sent through this outlet when a new frame is going to be processed.</description>
+      </outlet>
+      <outlet id="10" name="Dump" type="atom">
+        <digest>Dump out.</digest>
+        <description>Dump out.</description>
+      </outlet>
+    </outletlist>
+	
+	<!--INLETS-->
+	<inletlist>
+		<inlet id="0" type="signal">
+			<digest>
+				Bang ouputs latest available frame, or 'active' attribute enables data streaming.
+			</digest>
+			<description>
+				Bang ouputs latest available frame, or 'active' attribute enable data streaming.
+			</description>
+		</inlet>
+		
+
+	</inletlist>	
+
+	<!--MESSAGES-->
+
+	<methodlist>
+		
+	    <method name="dump">
+	      <digest>returns infos on all connected devices through 'dump out' outlet.</digest>
+	      <description>When message ‘dump’ is received : returns infos on all connected devices through 'dump out' outlet. <br/>
+dump.begin<br/>
+device <br/>
+index <br/>
+serial <br/>
+product <br/>
+status <br/>
+caps <br/>
+baseline <br/>
+h_fov <br/>
+v_fov <br/>
+range <br/>
+dump.end
+</description>
+	    </method>	
+		
+	</methodlist>
+
+
+	<!--ATTRIBUTES-->
+
+	<attributelist>
+
+		<attribute name='Active' get='1' set='1' type='boolean' size='1' >
+			<digest>Data will be streamed when this is enabled.</digest>
+			<description>Data will be streamed when this is enabled. <br/> This is the best solution to get highest framerate and lowest latency.</description>
+		</attribute>
+
+
+	
+		<attribute name='device_index' get='1' set='1' type='long' size='1' >
+			<digest>Index of the UltraLeap device to bind to.</digest>
+			<description>Index of the UltraLeap device to bind to.<br/>
+			Default value : -1 (returns all frames from ALL connected devices)<br/>
+		1 : first devices plugged-in<br/>
+		2 : second device plugged-in<br/>
+		...</description>
+		</attribute>
+	
+		<attribute name='device_serial' get='1' set='1' type='symbol' size='1' >
+			<digest>Serial number of the UltraLeap device to bind to.</digest>
+			<description>Serial number of the UltraLeap device to bind to.<br/>
+			Specifying a serial overrides device_index attribute.<br/>
+			To get device serial number : use 'dump' message --> 'dump out' outlet.</description>
+		</attribute>
+		
+		<attribute name='unit' get='1' set='1' type='symbol' size='1' >
+			<digest>Distance unit: mm (milimeters : default) or m (meters). </digest>
+			<description>Distance unit: mm (milimeters : default) or m (meters). defines unit of all values returned by this object.<br/>
+		Default value is 'mm'(milimeters). To ease usage with Jitter / Open GL : use 'm' (meters). </description>
+		</attribute>
+		
+
+
+	</attributelist>
+
+
+
+	<misc name="Outlets">
+		<entry name="(0) End frame">
+			<description>
+				"A bang is sent through this outlet when the frame has been fully processed."
+			</description>
+		</entry>
+		<entry name="(1) Left hand bones">
+			<description>
+				If left hand is tracked, returns a list of 13 values for each finger bone : <br/>
+				fingerIndex-boneIndex prev_joint_x prev_joint_y prev_joint_z bone_quat_x bone_quat_y bone_quat_x-z bone_quat_x-w next_joint_x next_joint_y next_joint_z bone_width bone_length<br/>
+				4 bones per finger, 5 fingers per hand : total of 20 lists per hand.
+			</description>
+		</entry>
+		<entry name="(2) Right hand bones">
+			<description>
+				If right hand is tracked, returns a list of 13 values for each finger bone : <br/>
+				fingerIndex-boneIndex prev_joint_x prev_joint_y prev_joint_z bone_quat_x bone_quat_y bone_quat_x-z bone_quat_x-w next_joint_x next_joint_y next_joint_z bone_width bone_length<br/>
+				4 bones per finger, 5 fingers per hand : total of 20 lists per hand.
+			</description>
+		</entry>
+		<entry name="(3) Left hand fingers">
+			<description>				
+				If left hand is tracked, returns a list of 13 values for each finger : <br/>
+				finger_id(int) position_x position_y position_z quat_x quat_y quat_z quat_w velocity_x velocity_y velocity_z finger_is_extended finger_length
+			</description>
+		</entry>
+		<entry name="(4) Right hand fingers">
+			<description>				
+				If right hand is tracked, returns a list of 13 values for each finger : <br/>
+				finger_id(int) position_x position_y position_z quat_x quat_y quat_z quat_w velocity_x velocity_y velocity_z finger_is_extended finger_length
+			</description>
+		</entry>
+		<entry name="(5) Left hand">
+			<description>				
+				If left hand is tracked, returns a list of 14 values for each finger : <br/>
+				hand_id(int) position_x position_y position_z quat_x quat_y quat_z quat_w velocity_x velocity_y velocity_z pinch grab visible_time
+			</description>
+		</entry>
+		<entry name="(6) Right hand">
+			<description>				
+				If right hand is tracked, returns a list of 14 values for each finger : <br/>
+				hand_id(int) position_x position_y position_z quat_x quat_y quat_z quat_w velocity_x velocity_y velocity_z pinch grab visible_time
+			</description>
+		</entry>
+
+	<entry name="(7) Frame infos">
+		<description>				
+			for each frame, returns : <br/>
+			frame_id left_hand_tracking_status right_hand_tracking_status device_framerate
+		</description>
+	</entry>
+	<entry name="(8) Start frame">
+		<description>
+			"A bang is sent through this outlet when a new frame is going to be processed."
+		</description>
+	</entry>
+
+<entry name="(9) Dump outlet">
+	      <description>When message ‘dump’ is received : returns infos for each connected device through 'dump out' outlet. <br/>
+dump.begin<br/>
+device <br/>
+index <br/>
+serial <br/>
+product <br/>
+status <br/>
+caps <br/>
+baseline <br/>
+h_fov <br/>
+v_fov <br/>
+range <br/>
+dump.end
+</description>
+</entry>
+	
+	
+	
+	</misc>
+
+</c74object>
