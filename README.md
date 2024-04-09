@@ -29,7 +29,3 @@ This external is built thanks to the [Avendish](https://github.com/celtera/avend
 
 - Output stereo camera images (jitter matrix / texture)
 
-
-## Known issues
-Fingers velocity is currently not working (returns 0. 0. 0.)
-Ultraleap sdk doesn’t returns fingers velocity, so it should be computed internally.
