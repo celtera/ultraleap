@@ -5,7 +5,6 @@
 #include <boost/container/small_vector.hpp>
 #include <boost/container/static_vector.hpp>
 #include <boost/variant2.hpp>
-#include <ext.h>
 
 #include <cinttypes>
 #include <cstdint>
@@ -17,6 +16,7 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <ranges>
 #include <thread>
 #include <vector>
 
