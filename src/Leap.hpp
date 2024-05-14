@@ -5,6 +5,7 @@
 #include <boost/container/small_vector.hpp>
 #include <boost/container/static_vector.hpp>
 #include <boost/variant2.hpp>
+#include <ossia/detail/dylib_loader.hpp>
 
 #include <cinttypes>
 #include <cstdint>
@@ -22,6 +23,63 @@
 
 namespace ul
 {
+
+#define UL_SYMBOL_NAME_S(prefix, name) #prefix #name
+#define UL_SYMBOL_NAME(prefix, name) prefix##name
+#define UL_SYMBOL_DEF(prefix, name) decltype(&::UL_SYMBOL_NAME(prefix, name)) name{};
+#define UL_SYMBOL_INIT(prefix, name)                                  \
+  {                                                                   \
+    name = library.symbol<decltype(&::UL_SYMBOL_NAME(prefix, name))>( \
+        UL_SYMBOL_NAME_S(prefix, name));                              \
+    if(!name)                                                         \
+    {                                                                 \
+      available = false;                                              \
+      return;                                                         \
+    }                                                                 \
+  }
+
+struct libleapc
+{
+  explicit libleapc()
+      : library{
+            {"libLeapC.so.5", "libLeapC.so.6", "LeapC.dll", "libLeapC.5.dylib",
+             "libLeapC.6.dylib"}}
+  {
+    UL_SYMBOL_INIT(Leap, CreateConnection);
+    UL_SYMBOL_INIT(Leap, OpenConnection);
+    UL_SYMBOL_INIT(Leap, SetAllocator);
+    UL_SYMBOL_INIT(Leap, SetPolicyFlags);
+    UL_SYMBOL_INIT(Leap, CloseConnection);
+    UL_SYMBOL_INIT(Leap, DestroyConnection);
+    UL_SYMBOL_INIT(Leap, OpenDevice);
+    UL_SYMBOL_INIT(Leap, GetDeviceInfo);
+    UL_SYMBOL_INIT(Leap, SubscribeEvents);
+    UL_SYMBOL_INIT(Leap, CloseDevice);
+    UL_SYMBOL_INIT(Leap, PollConnection);
+  }
+
+  static const libleapc& instance()
+  {
+    static const libleapc self;
+    return self;
+  }
+
+  ossia::dylib_loader library;
+  bool available{true};
+
+  UL_SYMBOL_DEF(Leap, CreateConnection);
+  UL_SYMBOL_DEF(Leap, OpenConnection);
+  UL_SYMBOL_DEF(Leap, SetAllocator);
+  UL_SYMBOL_DEF(Leap, SetPolicyFlags);
+  UL_SYMBOL_DEF(Leap, CloseConnection);
+  UL_SYMBOL_DEF(Leap, DestroyConnection);
+  UL_SYMBOL_DEF(Leap, OpenDevice);
+  UL_SYMBOL_DEF(Leap, GetDeviceInfo);
+  UL_SYMBOL_DEF(Leap, SubscribeEvents);
+  UL_SYMBOL_DEF(Leap, CloseDevice);
+  UL_SYMBOL_DEF(Leap, PollConnection);
+};
+
 struct device_info
 {
   uint32_t status;
@@ -76,6 +134,7 @@ using subscriber_handle = std::shared_ptr<subscriber>;
 
 struct leap_manager
 {
+  const ul::libleapc& Leap = ul::libleapc::instance();
   static constexpr LEAP_ALLOCATOR allocator
       = {+[](uint32_t size, eLeapAllocatorType typeHint, void* state) {
            return malloc(size);
@@ -91,14 +150,14 @@ struct leap_manager
     config.size = sizeof(config);
     config.flags = eLeapConnectionConfig_MultiDeviceAware;
 
-    if(LeapCreateConnection(&config, &m_handle) != eLeapRS_Success)
+    if(Leap.CreateConnection(&config, &m_handle) != eLeapRS_Success)
       return;
 
-    if(LeapOpenConnection(m_handle) != eLeapRS_Success)
+    if(Leap.OpenConnection(m_handle) != eLeapRS_Success)
       return;
 
-    LeapSetAllocator(m_handle, &allocator);
-    LeapSetPolicyFlags(
+    Leap.SetAllocator(m_handle, &allocator);
+    Leap.SetPolicyFlags(
         m_handle,
         eLeapPolicyFlag_Images | eLeapPolicyFlag_MapPoints
             | eLeapPolicyFlag_BackgroundFrames,
@@ -117,16 +176,16 @@ struct leap_manager
   {
     m_running = false;
 
-    LeapCloseConnection(m_handle);
+    Leap.CloseConnection(m_handle);
     m_thread.join();
 
-    LeapDestroyConnection(m_handle);
+    Leap.DestroyConnection(m_handle);
   }
 
   void register_device(const LEAP_DEVICE_EVENT* device_event)
   {
     LEAP_DEVICE hdl{};
-    auto res = LeapOpenDevice(device_event->device, &hdl);
+    auto res = Leap.OpenDevice(device_event->device, &hdl);
     if(res != eLeapRS_Success)
     {
       return;
@@ -138,11 +197,11 @@ struct leap_manager
         .serial = (char*)malloc(1)};
 
     // Most stupid little dance i've ever seen
-    res = LeapGetDeviceInfo(hdl, &props);
+    res = Leap.GetDeviceInfo(hdl, &props);
     if(res == eLeapRS_InsufficientBuffer)
     {
       props.serial = (char*)realloc(props.serial, props.serial_length);
-      res = LeapGetDeviceInfo(hdl, &props);
+      res = Leap.GetDeviceInfo(hdl, &props);
       if(res != eLeapRS_Success)
       {
         free(props.serial);
@@ -162,13 +221,13 @@ struct leap_manager
       d.v_fov = props.v_fov;
       d.range = props.range;
 
-      LeapSubscribeEvents(m_handle, hdl);
+      Leap.SubscribeEvents(m_handle, hdl);
       std::lock_guard _{m_devices_lock};
       this->m_devices[device_event->device.id] = std::move(d);
     }
 
     free(props.serial);
-    LeapCloseDevice(hdl);
+    // Leap.CloseDevice(hdl);
   }
 
   void unregister_device(const LEAP_DEVICE_EVENT* device_event)
@@ -186,7 +245,7 @@ struct leap_manager
   void poll_one()
   {
     LEAP_CONNECTION_MESSAGE msg{};
-    auto result = LeapPollConnection(m_handle, 1000, &msg);
+    auto result = Leap.PollConnection(m_handle, 1000, &msg);
 
     if(result != eLeapRS_Success)
       return;
