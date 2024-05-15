@@ -12,7 +12,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <format>
 #include <functional>
 #include <memory>
 #include <mutex>
