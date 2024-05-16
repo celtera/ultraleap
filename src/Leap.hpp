@@ -41,6 +41,7 @@ struct libleapc
 {
   explicit libleapc()
       : library{{
+  // clang-format off
 #if defined(__linux__)
           "libLeapC.so.5", "libLeapC.so.6",
           "/usr/lib/ultraleap-hand-tracking-service/libLeapC.so.5",
@@ -49,13 +50,14 @@ struct libleapc
           "/opt/ultraleap/LeapSDK/lib/libLeaC.so.6"
 #elif defined(__APPLE__)
           "libLeapC.5.dylib", "libLeapC.6.dylib",
-          "/Applications/Ultraleap Hand Tracking "
-          "Service.app/Contents/LeapSDK/lib/libLeapC.5.dylib",
-          "/Applications/Ultraleap Hand Tracking "
-          "Service.app/Contents/LeapSDK/lib/libLeapC.6.dylib"
+          "/Applications/Ultraleap Hand Tracking.app/Contents/LeapSDK/lib/libLeapC.5.dylib",
+          "/Applications/Ultraleap Hand Tracking.app/Contents/LeapSDK/lib/libLeapC.6.dylib",
+          "/Applications/Ultraleap Hand Tracking Service.app/Contents/LeapSDK/lib/libLeapC.5.dylib",
+          "/Applications/Ultraleap Hand Tracking Service.app/Contents/LeapSDK/lib/libLeapC.6.dylib",
 #else
           "LeapC.dll", "C:\\Program Files\\Ultraleap\\LeapSDK\\lib\\x64\\LeapC.dll"
 #endif
+          // clang-format on
       }}
   {
     UL_SYMBOL_INIT(Leap, CreateConnection);
