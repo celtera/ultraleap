@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
-project(MyProcessor)
+project(Ultraleap)
+
+set(CMAKE_CXX_STANDARD 23)
 
 include(dependencies.cmake)
 
@@ -27,7 +29,7 @@ avnd_make(
   MAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/Model.hpp"
   MAIN_CLASS ul::UltraLeap
   C_NAME ultraleap
-  BACKENDS "dump;max"
+  BACKENDS "dump;max;pd"
 )
 
 # Create a Max package

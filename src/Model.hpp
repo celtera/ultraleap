@@ -2,7 +2,6 @@
 #include "Leap.hpp"
 #include "TripleBuffer.hpp"
 
-#include <avnd/introspection/input.hpp>
 #include <halp/callback.hpp>
 #include <halp/controls.hpp>
 #include <halp/messages.hpp>

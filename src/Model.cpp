@@ -1,6 +1,5 @@
 #include "Model.hpp"
 
-#include <fmt/format.h>
 #include <halp/attributes.hpp>
 
 namespace ul
