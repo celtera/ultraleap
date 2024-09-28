@@ -66,3 +66,14 @@ if(MAX_PACKAGE_FOLDER)
       SUPPORT "${FILES_TO_INSTALL}"
   )
 endif()
+
+if(PD_PACKAGE_FOLDER)
+  avnd_create_pd_package(
+      NAME UltraLeap
+      SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/pd/"
+      PACKAGE_ROOT "${PD_PACKAGE_FOLDER}"
+
+      EXTERNALS UltraLeap_pd
+      SUPPORT "${FILES_TO_INSTALL}"
+  )
+endif()
