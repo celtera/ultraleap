@@ -4,6 +4,7 @@ project(Ultraleap)
 
 set(CMAKE_CXX_STANDARD 23)
 set(AVND_DISABLE_AUTOMAXREF ON CACHE "" INTERNAL)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 include(dependencies.cmake)
 
