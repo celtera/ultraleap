@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 project(Ultraleap)
 
 set(CMAKE_CXX_STANDARD 23)
+set(AVND_DISABLE_AUTOMAXREF ON CACHE "" INTERNAL)
 
 include(dependencies.cmake)
 
