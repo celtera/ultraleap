@@ -47,10 +47,11 @@ jobs:
                              -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
                              -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld \
                              -DCMAKE_SHARED_LINKER_FLAGS=-fuse-ld=lld \
-                             -DCMAKE_MODULE_LINKER_FLAGS=-fuse-ld=lld",
+                             -DCMAKE_MODULE_LINKER_FLAGS=-fuse-ld=lld \
+                             -DCMAKE_CXX_FLAGS='-static-libstdc++  -stdlib=libc++'",
               debug_flags: "-DCMAKE_BUILD_TYPE=Debug",
               release_flags: "-DCMAKE_BUILD_TYPE=Release",
-              build_flags: "-DCMAKE_CXX_FLAGS='-static-libstdc++ -stdlib=libc++'",
+              build_flags: "",
               dependencies: "sudo apt update ; \
                              sudo apt install lsb-release wget software-properties-common ; \
                              curl -L https://apt.llvm.org/llvm.sh > llvm.sh ; \

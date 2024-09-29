@@ -26,6 +26,11 @@ target_link_libraries(UltraLeap PUBLIC
     LeapC::Leap
 )
 
+set(BACKENDS_TO_BUILD "dump;max")
+if(NOT MSVC)
+  list(APPEND BACKENDS_TO_BUILD "pd")
+endif()
+
 avnd_make(
   TARGET UltraLeap
   MAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/Model.hpp"
