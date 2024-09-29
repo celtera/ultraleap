@@ -57,7 +57,7 @@ if(MSVC)
 endif()
 
 # Create a Max package
-if(MAX_PACKAGE_FOLDER AND TARGET UltraLeap_max)
+if(MAX_PACKAGE_FOLDER AND TARGET UltraLeap_base_max)
   set(FILES_TO_INSTALL "${LEAPC_RUNTIME}")
   if(WIN32 AND NOT MSVC)
     get_filename_component(cxx_path "${CMAKE_CXX_COMPILER}" PATH)
@@ -84,18 +84,18 @@ if(MAX_PACKAGE_FOLDER AND TARGET UltraLeap_max)
       NOTARIZE_EMAIL "$ENV{MAC_CODESIGN_EMAIL}"
       NOTARIZE_PASSWORD "$ENV{MAC_NOTARIZE_PASSWORD}"
 
-      EXTERNALS UltraLeap_max
+      EXTERNALS UltraLeap_base_max
       SUPPORT "${FILES_TO_INSTALL}"
   )
 endif()
 
-if(PD_PACKAGE_FOLDER AND TARGET UltraLeap_pd)
+if(PD_PACKAGE_FOLDER AND TARGET UltraLeap_base_pd)
   avnd_create_pd_package(
       NAME UltraLeap
       SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/pd/"
       PACKAGE_ROOT "${PD_PACKAGE_FOLDER}"
 
-      EXTERNALS UltraLeap_pd
+      EXTERNALS UltraLeap_base_pd
       SUPPORT "${FILES_TO_INSTALL}"
   )
 endif()
