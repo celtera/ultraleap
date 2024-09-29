@@ -5,8 +5,9 @@ Compatible with the Leap Motion Controller 1 & 2, Ultraleap 3Di Stereo,  IR 170 
 Requires [Gemini: Ultraleap Hand Tracking Software](https://leap2.ultraleap.com/gemini-downloads/)
 
 
-Build for [Max 8](https://cycling74.com/products/max) for Windows, Mac intel & arm64.
-
+Build for 
+- [Max 8](https://cycling74.com/products/max) for Windows, Mac intel & arm64
+- PureData 0.55
 
 
 This external returns :
@@ -18,8 +19,9 @@ Bones : prev_joint(xyz), bone_orientation(quat), next_joint(xyz), bone_width, bo
 ```
 Multiple devices support : select device by index or serial number.
 
-![ultraleap screenshot](/docs/ultraleap-screenshot.png?raw=true)
+![ultraleap max](/docs/ultraleap-screenshot.png?raw=true)
 ![ultraleap screenshot](/docs/ultraleap-screenshot2.png?raw=true)
+![Ultraleap pd](https://github.com/user-attachments/assets/abcd2b46-1ba1-4f20-b895-235f082d222a)
 
 This external is built thanks to the [Avendish](https://github.com/celtera/avendish) library, which allows (among other amazing things) automatically generation of Max/MSP and PureData objects.
 
