@@ -205,10 +205,16 @@ jobs:
           mkdir -p output
           find . -name '*.zip' -exec mv {} output/ \;
           cd output
-          for file in *.zip; do
-            unzip -o $file
-          done
+          echo " -- zip files: "
           ls
+          for file in *.zip; do
+            unzip -o $file || true
+          done
+
+          echo " -- extracted content: "
+          ls
+          echo " -- subfolders: "
+          ls */
           rm *.zip
 
           zip -r UltraLeap-max.zip UltraLeap-max
