@@ -14,14 +14,21 @@ include_directories(${MAXSDK_MSP_INCLUDE_DIR})
 
 ## Creating the external ##
 # Create a target for our base library
-add_library(UltraLeap STATIC
+
+add_library(UltraLeap_base STATIC
   src/Model.cpp
   src/Model.hpp
   src/Leap.hpp
   src/TripleBuffer.hpp
 )
 
-target_link_libraries(UltraLeap PUBLIC
+set_target_properties(UltraLeap_base PROPERTIES
+    PREFIX "prefix_bind_"
+    IMPORT_PREFIX "import_bind_"
+)
+
+
+target_link_libraries(UltraLeap_base PUBLIC
     Avendish::Avendish
     Boost::boost
     LeapC::Leap
@@ -36,7 +43,7 @@ if(NOT MSVC)
 endif()
 
 avnd_make(
-  TARGET UltraLeap
+  TARGET UltraLeap_base
   MAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/Model.hpp"
   MAIN_CLASS ul::UltraLeap
   C_NAME ultraleap
