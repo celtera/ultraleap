@@ -3,7 +3,7 @@ include(FetchContent)
 # Boost
 FetchContent_Declare(
   boost
-  URL "https://github.com/ossia/sdk/releases/download/sdk28/boost_1_83_0.tar.gz"
+  URL "https://github.com/ossia/sdk/releases/download/sdk31/boost_1_86_0.tar.gz"
 )
 FetchContent_Populate(boost)
 set(BOOST_ROOT "${boost_SOURCE_DIR}")
@@ -23,7 +23,7 @@ set(AVND_MAXSDK_PATH "${max_sdk_SOURCE_DIR}" CACHE INTERNAL "")
 if(WIN32)
   FetchContent_Declare(
     puredata
-    URL "http://msp.ucsd.edu/Software/pd-0.54-0.msw.zip"
+    URL "http://msp.ucsd.edu/Software/pd-0.55-1.msw.zip"
   )
   FetchContent_Populate(puredata)
   set(CMAKE_PREFIX_PATH "${puredata_SOURCE_DIR}/src;${puredata_SOURCE_DIR}/bin;${CMAKE_PREFIX_PATH}")
@@ -83,27 +83,27 @@ set_target_properties(LeapC::Leap PROPERTIES
 )
 if(WIN32)
   find_file(LEAPC_RUNTIME NAMES LeapC.dll HINTS "${LeapSDK_SOURCE_DIR}/lib/x64")
-else()
+elseif(APPLE)
   # Important: the official .dylib on mac is libLeapC.dylib but when linking against
   # it, the resulting external looks for libLeapC.5.dylib
   find_file(LEAPC_RUNTIME NAMES libLeapC.5.dylib HINTS "${LeapSDK_SOURCE_DIR}/lib/x64")
+else()
+  set(LEAPC_RUNTIME
+      "${LeapSDK_SOURCE_DIR}/lib/x64/libLeapC.so"
+      "${LeapSDK_SOURCE_DIR}/lib/x64/libLeapC.so.5"
+      "${LeapSDK_SOURCE_DIR}/lib/x64/liblibrealuvc.so"
+      "${LeapSDK_SOURCE_DIR}/lib/x64/liblibrealuvc.so.0"
+      "${LeapSDK_SOURCE_DIR}/lib/x64/liblibrealuvc.so.0.1.1"
+  )
 endif()
 
 # Avendish
-if(AVENDISH_EXTERNAL_SOURCE_DIR)
-FetchContent_Declare(
-    avendish
-    DOWNLOAD_COMMAND ""
-    SOURCE_DIR "${AVENDISH_EXTERNAL_SOURCE_DIR}"
-)
-else()
 FetchContent_Declare(
   avendish
   GIT_REPOSITORY "https://github.com/celtera/avendish"
   GIT_TAG main
   GIT_PROGRESS true
 )
-endif()
 FetchContent_Populate(avendish)
 
 set(CMAKE_PREFIX_PATH "${avendish_SOURCE_DIR};${CMAKE_PREFIX_PATH}")

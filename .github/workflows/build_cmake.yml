@@ -40,7 +40,7 @@ jobs:
             }
           - {
               name: "Ubuntu (clang)",
-              os: ubuntu-24.04,
+              os: ubuntu-22.04,
               triple: "linux-clang-x86_64",
               path: "",
               common_flags: "-DCMAKE_C_COMPILER=/usr/bin/clang-18 \
@@ -50,7 +50,7 @@ jobs:
                              -DCMAKE_MODULE_LINKER_FLAGS=-fuse-ld=lld",
               debug_flags: "-DCMAKE_BUILD_TYPE=Debug",
               release_flags: "-DCMAKE_BUILD_TYPE=Release",
-              build_flags: "",
+              build_flags: "-DCMAKE_CXX_FLAGS='-static-libstdc++ -stdlib=libc++'",
               dependencies: "sudo apt update ; \
                              sudo apt install lsb-release wget software-properties-common ; \
                              curl -L https://apt.llvm.org/llvm.sh > llvm.sh ; \
