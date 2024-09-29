@@ -72,6 +72,7 @@ find_path(LEAPC_HEADERS LeapC.h
 )
 find_library(LEAPC_LIBRARY NAMES LeapC
   HINTS
+    "${LeapSDK_SOURCE_DIR}/lib/"
     "${LeapSDK_SOURCE_DIR}/lib/x64"
 )
 
