@@ -175,12 +175,8 @@ jobs:
 
           cmake --build $BUILD_DIR -- ${{ matrix.config.build_flags }}
 
-          if [[ -f "$PWD/UltraLeap-max" ]]; then
-            cmake -E tar cf "$PWD/UltraLeap-max-${{ matrix.config.triple }}.zip" --format=zip -- "$PWD/UltraLeap-max"
-          fi
-          if [[ -f "$PWD/UltraLeap-pd" ]]; then
-            cmake -E tar cf "$PWD/UltraLeap-pd-${{ matrix.config.triple }}.zip" --format=zip -- "$PWD/UltraLeap-pd"
-          fi
+          cmake -E tar cf "$PWD/UltraLeap-max-${{ matrix.config.triple }}.zip" --format=zip -- "$PWD/UltraLeap-max" || true
+          cmake -E tar cf "$PWD/UltraLeap-pd-${{ matrix.config.triple }}.zip" --format=zip -- "$PWD/UltraLeap-pd" || true
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
