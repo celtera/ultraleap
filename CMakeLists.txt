@@ -12,6 +12,7 @@ include_directories(${concurrentqueue_SOURCE_DIR})
 include_directories(${MAXSDK_MAX_INCLUDE_DIR})
 include_directories(${MAXSDK_MSP_INCLUDE_DIR})
 
+## Creating the external ##
 # Create a target for our base library
 add_library(UltraLeap STATIC
   src/Model.cpp
@@ -41,6 +42,12 @@ avnd_make(
   C_NAME ultraleap
   BACKENDS "${BACKENDS_TO_BUILD}"
 )
+
+
+## Packaging ##
+if(MSVC)
+  return()
+endif()
 
 # Create a Max package
 if(MAX_PACKAGE_FOLDER)
