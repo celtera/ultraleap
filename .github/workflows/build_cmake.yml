@@ -210,8 +210,10 @@ jobs:
           ls
           rm *.zip
 
-          zip -r UltraLeap-max.zip UltraLeap
-          rm -rf UltraLeap
+          zip -r UltraLeap-max.zip UltraLeap-max
+          rm -rf UltraLeap-max
+          zip -r UltraLeap-pd.zip UltraLeap-pd
+          rm -rf UltraLeap-pd
 
       - name: Upload 
         uses: xresloader/upload-to-github-release@main
