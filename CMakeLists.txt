@@ -50,7 +50,7 @@ if(MSVC)
 endif()
 
 # Create a Max package
-if(MAX_PACKAGE_FOLDER)
+if(MAX_PACKAGE_FOLDER AND TARGET UltraLeap_max)
   set(FILES_TO_INSTALL "${LEAPC_RUNTIME}")
   if(WIN32 AND NOT MSVC)
     get_filename_component(cxx_path "${CMAKE_CXX_COMPILER}" PATH)
@@ -82,7 +82,7 @@ if(MAX_PACKAGE_FOLDER)
   )
 endif()
 
-if(PD_PACKAGE_FOLDER)
+if(PD_PACKAGE_FOLDER AND TARGET UltraLeap_pd)
   avnd_create_pd_package(
       NAME UltraLeap
       SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/pd/"
