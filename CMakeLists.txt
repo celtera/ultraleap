@@ -26,7 +26,10 @@ target_link_libraries(UltraLeap PUBLIC
     LeapC::Leap
 )
 
-set(BACKENDS_TO_BUILD "dump;max")
+set(BACKENDS_TO_BUILD "dump")
+if(WIN32 OR APPLE)
+  list(APPEND BACKENDS_TO_BUILD "max")
+endif()
 if(NOT MSVC)
   list(APPEND BACKENDS_TO_BUILD "pd")
 endif()
