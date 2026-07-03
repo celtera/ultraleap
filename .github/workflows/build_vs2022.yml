@@ -5,20 +5,20 @@ on: push
 jobs:
   build:
     name: VS2022
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout dependencies
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: ossia/score
           submodules: "recursive"
           path: score
 
       - name: Checkout Max SDK
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: jcelerier/max-sdk-base
           submodules: "recursive"
@@ -37,7 +37,7 @@ jobs:
           ./fetch-sdk.sh
 
       - name: Checkout Leap SDK
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: celtera/LeapSDK
           submodules: "recursive"

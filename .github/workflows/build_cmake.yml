@@ -90,7 +90,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install dependencies
         shell: bash
@@ -98,7 +98,7 @@ jobs:
           ${{ matrix.config.dependencies }}
 
       - name: Checkout Leap SDK
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: celtera/LeapSDK
           submodules: "recursive"
