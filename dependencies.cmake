@@ -102,7 +102,7 @@ endif()
 FetchContent_Declare(
   avendish
   GIT_REPOSITORY "https://github.com/celtera/avendish"
-  GIT_TAG main
+  GIT_TAG 558744dcd18657163a1d6955ed9992188e00e8ad
   GIT_PROGRESS true
 )
 FetchContent_Populate(avendish)
